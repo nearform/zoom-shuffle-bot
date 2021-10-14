@@ -21,6 +21,10 @@ server.register(require("fastify-postgres"), {
   },
 });
 
+server.get("/healtcheck", async (req, res) => {
+  res.send("OK");
+});
+
 server.get("/auth/bot-callback", async (req, res) => {
   try {
     let { code } = req.query;
@@ -158,12 +162,14 @@ server.post("/bot", async function (req, res) {
           body: [
             {
               type: "message",
-              text: partecipants.partecipants.map((partecipant) => partecipant.username).sort(() => (Math.random() > .5) ? 1 : -1).join(", "),
+              text: partecipants.partecipants
+                .map((partecipant) => partecipant.username)
+                .sort(() => (Math.random() > 0.5 ? 1 : -1))
+                .join(", "),
             },
           ],
         },
       });
-
     }
 
     res.code(200).send({});
@@ -205,7 +211,7 @@ async function upsertTokens(userId, tokens) {
 
 const start = async () => {
   try {
-    await server.listen(3000);
+    await server.listen(process.env.PORT, "0.0.0.0");
   } catch (err) {
     server.log.error(err);
     process.exit(1);
