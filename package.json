@@ -14,7 +14,10 @@
     "dotenv": "^10.0.0",
     "ejs": "^3.1.6",
     "fastify": "^3.22.0",
+    "fastify-postgres": "^3.6.0",
+    "moment": "^2.29.1",
     "node-fetch": "^3.0.0",
+    "pg": "^8.7.1",
     "point-of-view": "^4.15.2"
   }
 }
