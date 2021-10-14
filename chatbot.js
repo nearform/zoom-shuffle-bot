@@ -85,12 +85,21 @@ server.post("/bot", async function (req, res) {
     }
 
     if (command === "meetings") {
-      const meetings = await zoomApp.request({
-        url: `/v2/users/${userId}/meetings`,
-        method: "get",
+      // const meetings = await zoomApp.request({
+      //   url: `/v2/users/${userId}/meetings`,
+      //   method: "get",
+      // });
+
+      let meetings = await zoomApp.request({
+        url: `/v2/metrics/meetings`,
+        method: "get"
       });
 
-      const resMeeting = meetings.meetings.map((meeting) => ({
+      meetings = meetings.meetings.filter(
+        (meeting) => meeting.email === process.env.ENGMNG_EMAIL
+      );
+
+      const resMeeting = meetings.map((meeting) => ({
         text: meeting.topic,
         value: `meeting/${meeting.id}`,
       }));
@@ -147,9 +156,11 @@ server.post("/bot", async function (req, res) {
       // });
 
       const partecipants = await zoomApp.request({
-        url: `https://api.zoom.us/v2/metrics/meetings/${meetingId}/participants`,
+        url: `/v2/metrics/meetings/${meetingId}/participants`,
         method: "get",
       });
+
+      console.log(partecipants);
 
       await zoomApp.sendMessage({
         user_jid: userJid,
@@ -163,8 +174,8 @@ server.post("/bot", async function (req, res) {
             {
               type: "message",
               text: partecipants.partecipants
-                .map((partecipant) => partecipant.username)
-                .sort(() => (Math.random() > 0.5 ? 1 : -1))
+                .map((partecipant) => partecipant.user_name)
+                // .sort(() => (Math.random() > 0.5 ? 1 : -1))
                 .join(", "),
             },
           ],
