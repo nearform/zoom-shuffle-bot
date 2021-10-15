@@ -98,7 +98,7 @@ server.post("/bot", async function (req, res) {
         }
       });
 
-      const meetings = await response.json();
+      let meetings = await response.json();
 
       console.log(meetings)
 
