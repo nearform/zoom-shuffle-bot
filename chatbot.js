@@ -1,9 +1,9 @@
-import { oauth2, client, setting, log }  from "@zoomus/chatbot";
+import { oauth2, client }  from "@zoomus/chatbot";
 import moment  from "moment";
 import fetch from "node-fetch";
 import fastify from "fastify";
 import fastifypostgres from "fastify-postgres";
-
+import jwt from 'jsonwebtoken';
 import dotenv from "dotenv";
 
 dotenv.config();
@@ -52,10 +52,10 @@ server.get("/auth/bot-callback", async (req, res) => {
 });
 
 server.post("/bot", async function (req, res) {
-  console.log("ping");
   try {
+    const jwtToken = getJWTToken();
     let data = await chatbot.handle({ body: req.body, headers: req.headers });
-    let { event, command, type, payload } = data;
+    let { command, payload } = data;
     let { toJid, userJid, accountId, userId, actionItem } = payload;
 
     let zoomApp = chatbot.create();
@@ -90,11 +90,15 @@ server.post("/bot", async function (req, res) {
       );
     }
 
+    const {email: user_email} = await zoomApp.request({ url: "/v2/users/me", method: "get" }); 
+    console.log(user_email)
+
+
     if (command === "meetings") {
       const response = await fetch("https://api.zoom.us/v2/metrics/meetings", {
         method: "GET",
         headers: {
-          Authorization: `Bearer ${process.env.JWT_TOKEN}`,
+          Authorization: `Bearer ${jwtToken}`,
         }
       });
 
@@ -103,7 +107,7 @@ server.post("/bot", async function (req, res) {
       console.log(meetings)
 
       meetings = meetings.meetings.filter(
-        (meeting) => meeting.email === process.env.ENGMNG_EMAIL
+        (meeting) => meeting.email === user_email
       );
 
       const resMeeting = meetings.map((meeting) => ({
@@ -138,7 +142,7 @@ server.post("/bot", async function (req, res) {
       const response = await fetch(`https://api.zoom.us/v2/metrics/meetings/${meetingId}/participants`, {
         method: "GET",
         headers: {
-          Authorization: `Bearer ${process.env.JWT_TOKEN}`,
+          Authorization: `Bearer ${jwtToken}`,
         }
       });
       const participants = await response.json();
@@ -225,6 +229,15 @@ async function upsertTokens(userId, tokens) {
 
   await dbClient.query(query);
   dbClient.release();
+}
+
+function getJWTToken() {
+  const payload = {
+      iss: process.env.API_KEY,
+      exp: ((new Date()).getTime() + 5000)
+  };
+  
+  return jwt.sign(payload, process.env.API_SECRET);
 }
 
 const start = async () => {
