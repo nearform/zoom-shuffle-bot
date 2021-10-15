@@ -173,7 +173,7 @@ server.post("/bot", async function (req, res) {
       const randomParticipant = participants.participants
         .map((p) => p.user_name)
         .sort(() => Math.random() - 0.5)
-        .join("\n ");
+        .join("\n");
       console.log(randomParticipant);
 
       await zoomApp.sendMessage({
