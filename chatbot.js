@@ -161,6 +161,8 @@ server.post("/bot", async function (req, res) {
       });
 
       console.log(partecipants);
+      const randomPartecipant = partecipants.participants.map(p => p.user_name).sort(() => Math.random() - 0.5).join(", ")
+      console.log(randomPartecipant)
 
       await zoomApp.sendMessage({
         user_jid: userJid,
@@ -173,10 +175,7 @@ server.post("/bot", async function (req, res) {
           body: [
             {
               type: "message",
-              text: partecipants.partecipants
-                .map((partecipant) => partecipant.user_name)
-                // .sort(() => (Math.random() > 0.5 ? 1 : -1))
-                .join(", "),
+              text: randomPartecipant,
             },
           ],
         },
