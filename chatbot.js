@@ -94,7 +94,7 @@ server.post("/bot", async function (req, res) {
       const response = await fetch("https://api.zoom.us/v2/metrics/meetings", {
         method: "GET",
         headers: {
-          Authorization: `${process.env.JWT_TOKEN}`,
+          Authorization: `Bearer ${process.env.JWT_TOKEN}`,
         }
       });
 
@@ -138,7 +138,7 @@ server.post("/bot", async function (req, res) {
       const response = await fetch(`https://api.zoom.us/v2/metrics/meetings/${meetingId}/partecipants`, {
         method: "GET",
         headers: {
-          Authorization: `${process.env.JWT_TOKEN}`,
+          Authorization: `Bearer ${process.env.JWT_TOKEN}`,
         }
       });
       const partecipants = await response.json();
