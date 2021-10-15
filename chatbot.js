@@ -135,42 +135,42 @@ server.post("/bot", async function (req, res) {
     if (actionItem && actionItem.value.startsWith("meeting/")) {
       const meetingId = actionItem.value.split("/")[1];
 
-      const response = await fetch(`https://api.zoom.us/v2/metrics/meetings/${meetingId}/partecipants`, {
+      const response = await fetch(`https://api.zoom.us/v2/metrics/meetings/${meetingId}/participants`, {
         method: "GET",
         headers: {
           Authorization: `Bearer ${process.env.JWT_TOKEN}`,
         }
       });
-      const partecipants = await response.json();
+      const participants = await response.json();
 
-      console.log(partecipants);
+      console.log(participants);
 
-      if(partecipants?.code === 3001){
+      if(participants?.code === 3001){
         await zoomApp.sendMessage({
           user_jid: userJid,
           to_jid: toJid,
           account_id: accountId,
           content: {
             head: {
-              text: "Meeting partecipants",
+              text: "Meeting participants",
             },
             body: [
               {
                 type: "message",
-                text: partecipants.message,
+                text: participants.message,
               },
             ],
           },
         }); 
-        console.log(partecipants);
+        console.log(participants);
         return res.code(500).send({})
       }
 
-      const randomPartecipant = partecipants.participants
+      const randomParticipant = participants.participants
         .map((p) => p.user_name)
         .sort(() => Math.random() - 0.5)
         .join(", ");
-      console.log(randomPartecipant);
+      console.log(randomParticipant);
 
       await zoomApp.sendMessage({
         user_jid: userJid,
@@ -178,12 +178,12 @@ server.post("/bot", async function (req, res) {
         account_id: accountId,
         content: {
           head: {
-            text: "Meeting partecipants",
+            text: "Meeting participants",
           },
           body: [
             {
               type: "message",
-              text: randomPartecipant,
+              text: randomParticipant,
             },
           ],
         },

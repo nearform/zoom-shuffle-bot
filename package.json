@@ -20,5 +20,8 @@
     "node-fetch": "^3.0.0",
     "pg": "^8.7.1",
     "point-of-view": "^4.15.2"
+  },
+  "devDependencies": {
+    "eslint": "^8.0.1"
   }
 }
