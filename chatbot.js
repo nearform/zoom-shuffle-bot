@@ -1,8 +1,12 @@
-const { oauth2, client, setting, log } = require("@zoomus/chatbot");
-const moment = require("moment");
-const fetch = require("node-fetch");
+import { oauth2, client, setting, log }  from "@zoomus/chatbot";
+import moment  from "moment";
+import fetch from "node-fetch";
+import fastify from "fastify";
+import fastifypostgres from "fastify-postgres";
 
-require("dotenv").config();
+import dotenv from "dotenv";
+
+dotenv.config();
 const oauth2Client = oauth2(
   process.env.CLIENT_ID,
   process.env.CLIENT_SECRET,
@@ -14,9 +18,9 @@ let chatbot = client(
   process.env.ROBOT_JID
 ).defaultAuth(oauth2Client.connect());
 
-const server = require("fastify")({ logger: true });
+const server = fastify({ logger: true });
 
-server.register(require("fastify-postgres"), {
+server.register(fastifypostgres, {
   connectionString: process.env.DATABASE_URL,
   ssl: {
     rejectUnauthorized: false,
@@ -97,7 +101,7 @@ server.post("/bot", async function (req, res) {
       const meetings = await response.json();
 
       console.log(meetings)
-      
+
       meetings = meetings.meetings.filter(
         (meeting) => meeting.email === process.env.ENGMNG_EMAIL
       );
