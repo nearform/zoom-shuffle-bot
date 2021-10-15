@@ -1,5 +1,7 @@
 const { oauth2, client, setting, log } = require("@zoomus/chatbot");
 const moment = require("moment");
+const fetch = require("node-fetch");
+
 require("dotenv").config();
 const oauth2Client = oauth2(
   process.env.CLIENT_ID,
@@ -85,16 +87,17 @@ server.post("/bot", async function (req, res) {
     }
 
     if (command === "meetings") {
-      // const meetings = await zoomApp.request({
-      //   url: `/v2/users/${userId}/meetings`,
-      //   method: "get",
-      // });
-
-      let meetings = await zoomApp.request({
-        url: `/v2/metrics/meetings`,
-        method: "get"
+      const response = await fetch("https://api.zoom.us/v2/metrics/meetings", {
+        method: "GET",
+        headers: {
+          Authorization: `${process.env.JWT_TOKEN}`,
+        }
       });
 
+      const meetings = await response.json();
+
+      console.log(meetings)
+      
       meetings = meetings.meetings.filter(
         (meeting) => meeting.email === process.env.ENGMNG_EMAIL
       );
@@ -127,42 +130,43 @@ server.post("/bot", async function (req, res) {
 
     if (actionItem && actionItem.value.startsWith("meeting/")) {
       const meetingId = actionItem.value.split("/")[1];
-      const meeting = await zoomApp.request({
-        url: `/v2/meetings/${meetingId}`,
-        method: "get",
-      });
 
-      await zoomApp.sendMessage({
-        user_jid: userJid,
-        to_jid: toJid,
-        account_id: accountId,
-        content: {
-          head: {
-            text: "Meeting details",
-          },
-          body: [
-            {
-              type: "message",
-              text: meeting.start_url,
-            },
-          ],
-        },
+      const response = await fetch(`https://api.zoom.us/v2/metrics/meetings/${meetingId}/partecipants`, {
+        method: "GET",
+        headers: {
+          Authorization: `${process.env.JWT_TOKEN}`,
+        }
       });
-
-      // const partecipants = await zoomApp.request({
-      //   url: `/v2/past_meetings/${meeting.uuid}`,
-      //   method: "get",
-      //   // headers: { "content-type": "application/json" },
-      // });
-
-      const partecipants = await zoomApp.request({
-        url: `/v2/metrics/meetings/${meetingId}/participants`,
-        method: "get",
-      });
+      const partecipants = await response.json();
 
       console.log(partecipants);
-      const randomPartecipant = partecipants.participants.map(p => p.user_name).sort(() => Math.random() - 0.5).join(", ")
-      console.log(randomPartecipant)
+
+      if(partecipants?.code === 3001){
+        await zoomApp.sendMessage({
+          user_jid: userJid,
+          to_jid: toJid,
+          account_id: accountId,
+          content: {
+            head: {
+              text: "Meeting partecipants",
+            },
+            body: [
+              {
+                type: "message",
+                text: partecipants.message,
+              },
+            ],
+          },
+        }); 
+        console.log(partecipants);
+        return res.code(500).send({})
+      }
+
+      const randomPartecipant = partecipants.participants
+        .map((p) => p.user_name)
+        .sort(() => Math.random() - 0.5)
+        .join(", ");
+      console.log(randomPartecipant);
 
       await zoomApp.sendMessage({
         user_jid: userJid,
