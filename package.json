@@ -1,12 +1,13 @@
 {
-  "name": "talking-stick",
+  "name": "zoom-talking-stick",
   "version": "1.0.0",
   "description": "",
   "main": "chatbot.js",
   "type": "module",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "node chatbot.js"
+    "start": "node chatbot.js",
+    "lint": "eslint ."
   },
   "author": "",
   "license": "ISC",
@@ -23,6 +24,9 @@
     "point-of-view": "^4.15.2"
   },
   "devDependencies": {
-    "eslint": "^8.0.1"
+    "eslint": "^8.0.1",
+    "eslint-config-prettier": "^8.3.0",
+    "eslint-plugin-prettier": "^4.0.0",
+    "prettier": "^2.4.1"
   }
 }
