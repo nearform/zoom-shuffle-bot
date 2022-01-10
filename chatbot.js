@@ -171,8 +171,12 @@ server.post('/bot', async function (req, res) {
         return res.code(500).send({})
       }
 
-      const randomParticipant = participants.participants
-        .map(p => p.user_name)
+      // remove duplicates in case of a possible API bug, or someone joining the meeting from multiple devices
+      const uniqueParticipants = [
+        ...new Set(participants.participants.map(p => p.user_name)),
+      ]
+
+      const randomParticipant = uniqueParticipants
         .sort(() => Math.random() - 0.5)
         .join('\n')
       console.log(randomParticipant)
