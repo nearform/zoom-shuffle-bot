@@ -7,9 +7,12 @@ const server = fastify({ logger: true })
 
 server.register(import('fastify-postgres'), {
   connectionString: process.env.DATABASE_URL,
-  ssl: {
-    rejectUnauthorized: false,
-  },
+  ssl:
+    process.env.NODE_ENV === 'development'
+      ? false
+      : {
+          rejectUnauthorized: false,
+        },
 })
 
 server.get('/healthcheck', async () => 'ok')
