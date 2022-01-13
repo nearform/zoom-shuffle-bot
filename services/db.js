@@ -21,3 +21,34 @@ export async function upsertTokens(client, userId, tokens) {
     [userId, tokens.access_token, tokens.refresh_token, expiresDate]
   )
 }
+
+export async function addParticipant(client, meeting, participant) {
+  return client.query(
+    'INSERT INTO meetings(id, topic, host_id, participants) VALUES($1, $2, $3, $4) ON CONFLICT (id) DO UPDATE SET participants = meetings.participants || excluded.participants',
+    [meeting.id, meeting.topic, meeting.host_id, JSON.stringify([participant])]
+  )
+}
+
+export async function removeParticipant(client, meetingId, participant) {
+  return client.query(
+    'UPDATE ONLY meetings SET participants = participants - $2 WHERE id = $1',
+    [meetingId, participant]
+  )
+}
+
+export async function removeMeeting(client, meetingId) {
+  return client.query('DELETE FROM meetings WHERE id = $1', [meetingId])
+}
+
+export async function getHostMeetingParticipants(client, hostId) {
+  const result = await client.query(
+    'SELECT participants FROM meetings WHERE host_id = $1',
+    [hostId]
+  )
+
+  if (result.rows.length === 0 || !result.rows[0].participants) {
+    return undefined
+  } else {
+    return result.rows[0].participants
+  }
+}

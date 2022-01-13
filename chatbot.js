@@ -17,6 +17,7 @@ server.register(import('fastify-postgres'), {
 
 server.get('/healthcheck', async () => 'ok')
 
+server.register(import('./routes/bot-hook.js'))
 server.register(import('./routes/bot.js'))
 server.register(import('./routes/bot-callback.js'))
 

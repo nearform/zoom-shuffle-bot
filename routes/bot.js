@@ -1,13 +1,16 @@
 import chatbot from '../services/zoom-chatbot.js'
-import { fetchMeeting, fetchUserMeetings } from '../services/zoom-metrics.js'
-import { getTokens, upsertTokens } from '../services/db.js'
+import {
+  getHostMeetingParticipants,
+  getTokens,
+  upsertTokens,
+} from '../services/db.js'
 
 export default async function (fastify) {
   fastify.post('/bot', async (req, res) => {
     try {
       const {
         command,
-        payload: { toJid, userJid, accountId, userId, actionItem },
+        payload: { toJid, userJid, accountId, userId },
       } = await chatbot.handle({
         body: req.body,
         headers: req.headers,
@@ -25,11 +28,6 @@ export default async function (fastify) {
         await upsertTokens(fastify.pg, userId, newTokens)
       }
 
-      const { email: user_email } = await zoomApp.request({
-        url: '/v2/users/me',
-        method: 'get',
-      })
-
       const sendMessage = content => {
         return zoomApp.sendMessage({
           user_jid: userJid, // which user can see this message
@@ -39,37 +37,17 @@ export default async function (fastify) {
         })
       }
 
-      if (command === 'meetings') {
-        const meetings = await fetchUserMeetings(user_email)
+      if (command === 'participants') {
+        const participants = await getHostMeetingParticipants(
+          fastify.pg,
+          userId
+        )
 
-        const messageItems = meetings.map(meeting => ({
-          text: meeting.topic,
-          value: `meeting/${meeting.id}`,
-        }))
+        if (participants) {
+          const randomParticipants = participants.sort(
+            () => Math.random() - 0.5
+          )
 
-        await sendMessage({
-          head: {
-            text: 'Meetings',
-            sub_head: {
-              text: 'select one meeting to see info',
-            },
-          },
-          body: [
-            {
-              type: 'actions',
-              items: messageItems,
-            },
-          ],
-        })
-      }
-
-      if (actionItem && actionItem.value.startsWith('meeting/')) {
-        const [, meetingId] = actionItem.value.split('/')
-
-        const response = await fetchMeeting(meetingId)
-
-        // TODO: this is actually a 404 -> handle it within a try/catch
-        if (response?.code === 3001) {
           await sendMessage({
             head: {
               text: 'Meeting participants',
@@ -77,40 +55,23 @@ export default async function (fastify) {
             body: [
               {
                 type: 'message',
-                text: response.message,
+                text: randomParticipants.join('\n'),
               },
             ],
           })
-
-          return res.code(500).send({})
-        }
-
-        // remove duplicates in case of a possible API bug, or someone joining the meeting from multiple devices
-        const uniqueParticipants = [
-          ...new Set(response.participants.map(p => p.user_name)),
-        ]
-
-        const randomParticipants = uniqueParticipants.sort(
-          () => Math.random() - 0.5
-        )
-
-        await sendMessage({
-          head: {
-            text: 'Meeting participants',
-          },
-          body: [
-            {
-              type: 'message',
-              text: randomParticipants.join('\n'),
+        } else {
+          await sendMessage({
+            head: {
+              text: "Sorry, you don't seem to be a host in any of the ongoing meetings.",
             },
-          ],
-        })
+          })
+        }
       }
 
-      res.code(200).send({})
+      res.code(200).send()
     } catch (error) {
       fastify.log.error(error)
-      res.code(500).send({})
+      res.code(500).send()
     }
   })
 }
