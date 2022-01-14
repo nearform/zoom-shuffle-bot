@@ -1,11 +1,11 @@
-import fastify from 'fastify'
+import Fastify from 'fastify'
 import dotenv from 'dotenv'
 
 dotenv.config()
 
-const server = fastify({ logger: true })
+const fastify = Fastify({ logger: true })
 
-server.register(import('fastify-postgres'), {
+fastify.register(import('fastify-postgres'), {
   connectionString: process.env.DATABASE_URL,
   ssl:
     process.env.NODE_ENV === 'development'
@@ -14,18 +14,24 @@ server.register(import('fastify-postgres'), {
           rejectUnauthorized: false,
         },
 })
+fastify.register(import('./plugins/zoom-chatbot.js'), {
+  clientId: process.env.CLIENT_ID,
+  clientSecret: process.env.CLIENT_SECRET,
+  botJid: process.env.ROBOT_JID,
+  verificationToken: process.env.VERIFICATION_TOKEN,
+})
 
-server.get('/healthcheck', async () => 'ok')
+fastify.get('/healthcheck', async () => 'ok')
 
-server.register(import('./routes/bot-hook.js'))
-server.register(import('./routes/bot.js'))
-server.register(import('./routes/bot-callback.js'))
+fastify.register(import('./routes/authorize.js'))
+fastify.register(import('./routes/hook.js'))
+fastify.register(import('./routes/bot.js'))
 
 const start = async () => {
   try {
-    await server.listen(process.env.PORT, '0.0.0.0')
+    await fastify.listen(process.env.PORT, '0.0.0.0')
   } catch (err) {
-    server.log.error(err)
+    fastify.log.error(err)
     process.exit(1)
   }
 }
