@@ -8,7 +8,10 @@
     "test": "echo \"Error: no test specified\" && exit 1",
     "start": "node chatbot.js",
     "dev": "nodemon --inspect chatbot.js",
-    "lint": "eslint ."
+    "lint": "eslint .",
+    "db:up": "docker-compose up -d",
+    "db:migrate": "postgrator",
+    "db:down": "docker-compose down"
   },
   "author": "",
   "license": "ISC",
@@ -25,6 +28,7 @@
     "eslint-config-prettier": "^8.3.0",
     "eslint-plugin-prettier": "^4.0.0",
     "nodemon": "^2.0.15",
+    "postgrator-cli": "^4.0.0",
     "prettier": "^2.5.1"
   }
 }
