@@ -16,24 +16,20 @@ export default async function (fastify) {
       const {
         event,
         payload: {
-          object: { id, topic, host_id, participant },
+          object: { id: meeting_id, host_id, participant },
         },
       } = req.body
 
       if (event === EVENT_PARTICIPANT_JOINED) {
-        await addParticipant(
-          fastify.pg,
-          { id, topic, host_id },
-          participant.user_name
-        )
+        await addParticipant(fastify.pg, meeting_id, host_id, participant.id)
       }
 
       if (event === EVENT_PARTICIPANT_LEFT) {
-        await removeParticipant(fastify.pg, id, participant.user_name)
+        await removeParticipant(fastify.pg, meeting_id, participant.id)
       }
 
       if (event === EVENT_MEETING_ENDED) {
-        await removeMeeting(fastify.pg, id)
+        await removeMeeting(fastify.pg, meeting_id)
       }
 
       res.code(200).send()

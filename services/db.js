@@ -23,16 +23,10 @@ export async function upsertTokenData(
   )
 }
 
-export async function addParticipant(client, meeting, participant) {
+export async function addParticipant(client, meetingId, hostId, participant) {
   return client.query(
-    'INSERT INTO meetings(id, topic, host_id, participants, date_added) VALUES($1, $2, $3, $4, $5) ON CONFLICT (id) DO UPDATE SET participants = meetings.participants || excluded.participants',
-    [
-      meeting.id,
-      meeting.topic,
-      meeting.host_id,
-      JSON.stringify([participant]),
-      new Date(),
-    ]
+    'INSERT INTO meetings(id, host_id, participants, date_added) VALUES($1, $2, $3, $4) ON CONFLICT (id) DO UPDATE SET participants = meetings.participants || excluded.participants',
+    [meetingId, hostId, JSON.stringify([participant]), new Date()]
   )
 }
 
@@ -49,7 +43,7 @@ export async function removeMeeting(client, meetingId) {
 
 export async function getHostActiveMeeting(client, hostId) {
   const result = await client.query(
-    'SELECT topic, participants FROM meetings WHERE host_id = $1 ORDER BY date_added desc',
+    'SELECT id, participants FROM meetings WHERE host_id = $1 ORDER BY date_added desc',
     [hostId]
   )
 

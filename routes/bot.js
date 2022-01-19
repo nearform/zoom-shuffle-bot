@@ -43,7 +43,11 @@ export default async function (fastify) {
 
         res.code(200).send()
       } catch (error) {
-        fastify.log.error(error)
+        if (process.env.NODE_ENV === 'development') {
+          console.error(error)
+        } else {
+          fastify.log.error(error.message)
+        }
         res.code(500).send()
       }
     }
