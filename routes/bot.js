@@ -18,7 +18,7 @@ export default async function (fastify) {
           })
         }
 
-        if (command === 'zoomtalkingstick') {
+        if (command === 'list') {
           const meeting = await getHostActiveMeeting(fastify.pg, userId)
 
           if (meeting && meeting.participants.length > 0) {
