@@ -40,19 +40,19 @@ export default async function (fastify) {
             `/meetings/${meeting.id}`
           )
 
+          await sendMessage(
+            {
+              head: {
+                text: `You're the host of *${topic}*.\nHere's a random list of its participants (${meeting.participants.length}):`,
+              },
+            },
+            true
+          )
+
           const participants = await fetchParticipantsNames(
             fastify,
             accountId,
             meeting.participants
-          )
-
-          await sendMessage(
-            {
-              head: {
-                text: `You're the host of *${topic}*.\nHere's a random list of its participants:`,
-              },
-            },
-            true
           )
 
           const randomParticipants = participants.sort(
