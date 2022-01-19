@@ -20,6 +20,11 @@ fastify.register(import('./plugins/zoom-chatbot.js'), {
   botJid: process.env.BOT_JID,
   verificationToken: process.env.VERIFICATION_TOKEN,
 })
+fastify.register(import('./plugins/zoom-api.js'), {
+  clientId: process.env.CLIENT_ID,
+  clientSecret: process.env.CLIENT_SECRET,
+  redirectUri: process.env.REDIRECT_URL,
+})
 
 fastify.get('/healthcheck', async () => 'ok')
 

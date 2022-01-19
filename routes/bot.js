@@ -1,5 +1,18 @@
 import { getHostActiveMeeting } from '../services/db.js'
 
+async function fetchParticipantsNames(fastify, accountId, participantsIds) {
+  const requests = participantsIds
+    .filter(userId => userId)
+    .map(userId => fastify.zoomApi.fetch(accountId, `/users/${userId}`))
+
+  // TODO: use `async` to limit parallel requests
+  const participants = await Promise.all(requests)
+
+  return participants.map(
+    ({ first_name, last_name }) => `${first_name} ${last_name}`
+  )
+}
+
 export default async function (fastify) {
   fastify.post(
     '/bot',
@@ -10,18 +23,39 @@ export default async function (fastify) {
           payload: { toJid, accountId, userId },
         } = req.body
 
-        const sendMessage = content => {
+        const sendMessage = (content, isMarkdown) => {
           return fastify.zoom.sendMessage({
             toJid,
             accountId,
             content,
+            isMarkdown,
           })
         }
 
         const meeting = await getHostActiveMeeting(fastify.pg, userId)
 
         if (meeting && meeting.participants.length > 0) {
-          const randomParticipants = meeting.participants.sort(
+          const { topic } = await fastify.zoomApi.fetch(
+            accountId,
+            `/meetings/${meeting.id}`
+          )
+
+          const participants = await fetchParticipantsNames(
+            fastify,
+            accountId,
+            meeting.participants
+          )
+
+          await sendMessage(
+            {
+              head: {
+                text: `You're the host of *${topic}*.\nHere's a random list of its participants:`,
+              },
+            },
+            true
+          )
+
+          const randomParticipants = participants.sort(
             () => Math.random() - 0.5
           )
 

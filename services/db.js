@@ -1,6 +1,6 @@
-export async function getTokenData(client, accountId) {
+export async function getBotTokenData(client, accountId) {
   const result = await client.query(
-    'SELECT * FROM tokens WHERE account_id = $1',
+    "SELECT * FROM tokens WHERE account_id = $1 AND token_type = 'bot'",
     [accountId]
   )
 
@@ -11,15 +11,41 @@ export async function getTokenData(client, accountId) {
   }
 }
 
-export async function upsertTokenData(
+export async function upsertBotTokenData(
   client,
   accountId,
   accessToken,
   expiresOn
 ) {
   return client.query(
-    'INSERT INTO tokens(account_id, access_token, expires_on) VALUES($1, $2, $3) ON CONFLICT (account_id) DO UPDATE set access_token = $2, expires_on = $3',
+    "INSERT INTO tokens(token_type, account_id, access_token, expires_on) VALUES('bot', $1, $2, $3) ON CONFLICT (token_type, account_id) DO UPDATE set access_token = $2, expires_on = $3",
     [accountId, accessToken, expiresOn]
+  )
+}
+
+export async function getApiTokenData(client, accountId) {
+  const result = await client.query(
+    "SELECT * FROM tokens WHERE account_id = $1 AND token_type = 'api'",
+    [accountId]
+  )
+
+  if (result.rows.length === 0) {
+    return undefined
+  } else {
+    return result.rows[0]
+  }
+}
+
+export async function upsertApiTokenData(
+  client,
+  accountId,
+  accessToken,
+  refreshToken,
+  expiresOn
+) {
+  return client.query(
+    "INSERT INTO tokens(token_type, account_id, access_token, refresh_token, expires_on) VALUES('api', $1, $2, $3, $4) ON CONFLICT (token_type, account_id) DO UPDATE set access_token = $2, refresh_token = $3, expires_on = $4",
+    [accountId, accessToken, refreshToken, expiresOn]
   )
 }
 

@@ -2,7 +2,7 @@ import fp from 'fastify-plugin'
 import fetch from 'node-fetch'
 import createError from 'http-errors'
 
-import { getTokenData, upsertTokenData } from '../services/db.js'
+import { getBotTokenData, upsertBotTokenData } from '../services/db.js'
 
 async function fetchToken(clientId, clientSecret) {
   const basicAuth = Buffer.from(`${clientId}:${clientSecret}`).toString(
@@ -37,7 +37,7 @@ async function plugin(fastify, options = {}) {
   )
 
   async function getToken(accountId) {
-    const tokenData = await getTokenData(fastify.pg, accountId)
+    const tokenData = await getBotTokenData(fastify.pg, accountId)
 
     if (tokenData && tokenData.expires_on > Date.now() / 1000) {
       return tokenData.access_token
@@ -49,13 +49,13 @@ async function plugin(fastify, options = {}) {
 
       const expiresOn = Date.now() / 1000 + expires_in
 
-      await upsertTokenData(fastify.pg, accountId, access_token, expiresOn)
+      await upsertBotTokenData(fastify.pg, accountId, access_token, expiresOn)
 
       return access_token
     }
   }
 
-  async function sendMessage({ toJid, accountId, content }) {
+  async function sendMessage({ toJid, accountId, content, isMarkdown }) {
     const token = await getToken(accountId)
 
     return fetch('https://api.zoom.us/v2/im/chat/messages', {
@@ -69,6 +69,7 @@ async function plugin(fastify, options = {}) {
         to_jid: toJid,
         account_id: accountId,
         content,
+        is_markdown_support: isMarkdown,
       }),
     })
   }
