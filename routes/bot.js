@@ -43,7 +43,7 @@ export default async function (fastify) {
           await sendMessage(
             {
               head: {
-                text: `You're the host of *${topic}*.\nHere's a random list of its participants (${meeting.participants.length}):`,
+                text: `You're the host of *${topic}*.\nHere's a random list of its (${meeting.participants.length}) participants:`,
               },
             },
             true
