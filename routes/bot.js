@@ -7,7 +7,7 @@ export default async function (fastify) {
     async (req, res) => {
       try {
         const {
-          payload: { toJid, accountId, userId, cmd: command },
+          payload: { toJid, accountId, userId },
         } = req.body
 
         const sendMessage = content => {
@@ -18,29 +18,27 @@ export default async function (fastify) {
           })
         }
 
-        if (command === 'list') {
-          const meeting = await getHostActiveMeeting(fastify.pg, userId)
+        const meeting = await getHostActiveMeeting(fastify.pg, userId)
 
-          if (meeting && meeting.participants.length > 0) {
-            const randomParticipants = meeting.participants.sort(
-              () => Math.random() - 0.5
-            )
+        if (meeting && meeting.participants.length > 0) {
+          const randomParticipants = meeting.participants.sort(
+            () => Math.random() - 0.5
+          )
 
-            await sendMessage({
-              body: [
-                {
-                  type: 'message',
-                  text: randomParticipants.join('\n'),
-                },
-              ],
-            })
-          } else {
-            await sendMessage({
-              head: {
-                text: "Sorry, you don't seem to be a host in any of the ongoing meetings.",
+          await sendMessage({
+            body: [
+              {
+                type: 'message',
+                text: randomParticipants.join('\n'),
               },
-            })
-          }
+            ],
+          })
+        } else {
+          await sendMessage({
+            head: {
+              text: "Sorry, you don't seem to be a host in any of the ongoing meetings.",
+            },
+          })
         }
 
         res.code(200).send()
