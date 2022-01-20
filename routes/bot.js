@@ -1,4 +1,4 @@
-import { getHostActiveMeeting } from '../services/db.js'
+import { getUserActiveMeeting } from '../services/db.js'
 import { decrypt } from '../helpers/crypto.js'
 
 export default async function (fastify) {
@@ -20,7 +20,7 @@ export default async function (fastify) {
           })
         }
 
-        const meeting = await getHostActiveMeeting(fastify.pg, userId)
+        const meeting = await getUserActiveMeeting(fastify.pg, userId)
 
         if (meeting && meeting.participants.length > 0) {
           const { topic } = await fastify.zoomApi.fetch(
@@ -31,7 +31,7 @@ export default async function (fastify) {
           await sendMessage(
             {
               head: {
-                text: `You're the host of *${topic}*.\nHere's a random list of its (${meeting.participants.length}) participants:`,
+                text: `You're currently in *${topic}* meeting.\nHere's a random list of its ${meeting.participants.length} participants:`,
               },
             },
             true
@@ -56,7 +56,7 @@ export default async function (fastify) {
         } else {
           await sendMessage({
             head: {
-              text: "Sorry, you don't seem to be a host in any of the ongoing meetings.",
+              text: "Sorry, you don't seem to be participating in any of the ongoing meetings.",
             },
           })
         }

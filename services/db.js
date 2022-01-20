@@ -49,28 +49,59 @@ export async function upsertApiTokenData(
   )
 }
 
-export async function addParticipant(client, meetingId, hostId, participant) {
-  return client.query(
-    'INSERT INTO meetings(id, host_id, participants, date_added) VALUES($1, $2, $3, $4) ON CONFLICT (id) DO UPDATE SET participants = meetings.participants || excluded.participants',
-    [meetingId, hostId, JSON.stringify([participant]), new Date()]
-  )
+export async function addParticipant(
+  client,
+  meetingId,
+  hostId,
+  userId,
+  participantName
+) {
+  if (userId) {
+    return client.query(
+      'INSERT INTO meetings(id, host_id, users, participants, date_added) VALUES($1, $2, $3, $4, $5) ON CONFLICT (id) DO UPDATE SET participants = meetings.participants || excluded.participants, users = meetings.users || excluded.users',
+      [
+        meetingId,
+        hostId,
+        JSON.stringify([userId]),
+        JSON.stringify([participantName]),
+        new Date(),
+      ]
+    )
+  } else {
+    return client.query(
+      'INSERT INTO meetings(id, host_id, participants, date_added) VALUES($1, $2, $3, $4) ON CONFLICT (id) DO UPDATE SET participants = meetings.participants || excluded.participants',
+      [meetingId, hostId, JSON.stringify([participantName]), new Date()]
+    )
+  }
 }
 
-export async function removeParticipant(client, meetingId, participant) {
-  return client.query(
-    'UPDATE ONLY meetings SET participants = participants - $2 WHERE id = $1',
-    [meetingId, participant]
-  )
+export async function removeParticipant(
+  client,
+  meetingId,
+  userId,
+  participantName
+) {
+  if (userId) {
+    return client.query(
+      'UPDATE ONLY meetings SET participants = participants - $3, users = users - $2 WHERE id = $1',
+      [meetingId, userId, participantName]
+    )
+  } else {
+    return client.query(
+      'UPDATE ONLY meetings SET participants = participants - $2 WHERE id = $1',
+      [meetingId, participantName]
+    )
+  }
 }
 
 export async function removeMeeting(client, meetingId) {
   return client.query('DELETE FROM meetings WHERE id = $1', [meetingId])
 }
 
-export async function getHostActiveMeeting(client, hostId) {
+export async function getUserActiveMeeting(client, userId) {
   const result = await client.query(
-    'SELECT id, participants FROM meetings WHERE host_id = $1 ORDER BY date_added desc',
-    [hostId]
+    'SELECT id, participants FROM meetings WHERE users @> $1 ORDER BY date_added desc',
+    [JSON.stringify([userId])]
   )
 
   if (result.rows.length === 0) {

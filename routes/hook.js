@@ -26,6 +26,7 @@ export default async function (fastify) {
           fastify.pg,
           meeting_id,
           host_id,
+          participant.participant_user_id,
           encrypt(participant.user_name)
         )
       }
@@ -34,6 +35,7 @@ export default async function (fastify) {
         await removeParticipant(
           fastify.pg,
           meeting_id,
+          participant.participant_user_id,
           encrypt(participant.user_name)
         )
       }
