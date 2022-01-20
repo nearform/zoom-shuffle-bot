@@ -37,7 +37,7 @@ async function refreshToken(clientId, clientSecret, refreshToken) {
 
   const queryParams = new URLSearchParams({
     grant_type: 'refresh_token',
-    refreshToken,
+    refresh_token: refreshToken,
   })
 
   const response = await fetch(`https://zoom.us/oauth/token?${queryParams}`, {
