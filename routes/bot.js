@@ -12,7 +12,7 @@ export default async function (fastify) {
         } = req.body
 
         const sendMessage = (content, isMarkdown) => {
-          return fastify.zoom.sendMessage({
+          return fastify.zoom.sendBotMessage({
             toJid,
             accountId,
             content,
@@ -23,7 +23,7 @@ export default async function (fastify) {
         const meeting = await getUserActiveMeeting(fastify.pg, userId)
 
         if (meeting && meeting.participants.length > 0) {
-          const { topic } = await fastify.zoomApi.fetch(
+          const { topic } = await fastify.zoom.fetch(
             accountId,
             `/meetings/${meeting.id}`
           )
@@ -31,7 +31,7 @@ export default async function (fastify) {
           await sendMessage(
             {
               head: {
-                text: `You're currently in *${topic}* meeting.\nHere's a random list of its ${meeting.participants.length} participants:`,
+                text: `You're currently in *${topic}*.\nHere's a random list of its ${meeting.participants.length} participants:`,
               },
             },
             true

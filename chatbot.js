@@ -14,15 +14,11 @@ fastify.register(import('fastify-postgres'), {
           rejectUnauthorized: false,
         },
 })
-fastify.register(import('./plugins/zoom-chatbot.js'), {
+fastify.register(import('./plugins/zoom.js'), {
   clientId: process.env.CLIENT_ID,
   clientSecret: process.env.CLIENT_SECRET,
   botJid: process.env.BOT_JID,
   verificationToken: process.env.VERIFICATION_TOKEN,
-})
-fastify.register(import('./plugins/zoom-api.js'), {
-  clientId: process.env.CLIENT_ID,
-  clientSecret: process.env.CLIENT_SECRET,
   redirectUri: process.env.REDIRECT_URL,
 })
 
