@@ -21,11 +21,16 @@ export default async function (fastify) {
       } = req.body
 
       if (event === EVENT_PARTICIPANT_JOINED) {
-        await addParticipant(fastify.pg, meeting_id, host_id, participant.id)
+        await addParticipant(
+          fastify.pg,
+          meeting_id,
+          host_id,
+          participant.user_name
+        )
       }
 
       if (event === EVENT_PARTICIPANT_LEFT) {
-        await removeParticipant(fastify.pg, meeting_id, participant.id)
+        await removeParticipant(fastify.pg, meeting_id, participant.user_name)
       }
 
       if (event === EVENT_MEETING_ENDED) {

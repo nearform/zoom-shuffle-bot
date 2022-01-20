@@ -1,18 +1,5 @@
 import { getHostActiveMeeting } from '../services/db.js'
 
-async function fetchParticipantsNames(fastify, accountId, participantsIds) {
-  const requests = participantsIds
-    .filter(userId => userId)
-    .map(userId => fastify.zoomApi.fetch(accountId, `/users/${userId}`))
-
-  // TODO: use `async` to limit parallel requests
-  const participants = await Promise.all(requests)
-
-  return participants.map(
-    ({ first_name, last_name }) => `${first_name} ${last_name}`
-  )
-}
-
 export default async function (fastify) {
   fastify.post(
     '/bot',
@@ -49,13 +36,7 @@ export default async function (fastify) {
             true
           )
 
-          const participants = await fetchParticipantsNames(
-            fastify,
-            accountId,
-            meeting.participants
-          )
-
-          const randomParticipants = participants.sort(
+          const randomParticipants = meeting.participants.sort(
             () => Math.random() - 0.5
           )
 
