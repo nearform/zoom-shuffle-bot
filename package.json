@@ -11,7 +11,8 @@
     "lint": "eslint .",
     "db:up": "docker-compose up -d",
     "db:migrate": "postgrator",
-    "db:down": "docker-compose down"
+    "db:down": "docker-compose down",
+    "db:connect": "docker-compose exec postgres psql -U postgres -d postgres"
   },
   "author": "",
   "license": "ISC",

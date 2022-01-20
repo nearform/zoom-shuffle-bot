@@ -3,6 +3,7 @@ import {
   removeMeeting,
   removeParticipant,
 } from '../services/db.js'
+import { encrypt } from '../helpers/crypto.js'
 
 const EVENT_PARTICIPANT_LEFT = 'meeting.participant_left'
 const EVENT_PARTICIPANT_JOINED = 'meeting.participant_joined'
@@ -25,12 +26,16 @@ export default async function (fastify) {
           fastify.pg,
           meeting_id,
           host_id,
-          participant.user_name
+          encrypt(participant.user_name)
         )
       }
 
       if (event === EVENT_PARTICIPANT_LEFT) {
-        await removeParticipant(fastify.pg, meeting_id, participant.user_name)
+        await removeParticipant(
+          fastify.pg,
+          meeting_id,
+          encrypt(participant.user_name)
+        )
       }
 
       if (event === EVENT_MEETING_ENDED) {

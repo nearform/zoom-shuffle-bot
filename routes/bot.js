@@ -1,4 +1,5 @@
 import { getHostActiveMeeting } from '../services/db.js'
+import { decrypt } from '../helpers/crypto.js'
 
 export default async function (fastify) {
   fastify.post(
@@ -36,7 +37,11 @@ export default async function (fastify) {
             true
           )
 
-          const randomParticipants = meeting.participants.sort(
+          const participants = meeting.participants.map(participant =>
+            decrypt(participant)
+          )
+
+          const randomParticipants = participants.sort(
             () => Math.random() - 0.5
           )
 
