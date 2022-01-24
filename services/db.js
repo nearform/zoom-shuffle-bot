@@ -56,23 +56,16 @@ export async function addParticipant(
   userId,
   participantName
 ) {
-  if (userId) {
-    return client.query(
-      'INSERT INTO meetings(id, host_id, users, participants, date_added) VALUES($1, $2, $3, $4, $5) ON CONFLICT (id) DO UPDATE SET participants = meetings.participants || excluded.participants, users = meetings.users || excluded.users',
-      [
-        meetingId,
-        hostId,
-        JSON.stringify([userId]),
-        JSON.stringify([participantName]),
-        new Date(),
-      ]
-    )
-  } else {
-    return client.query(
-      'INSERT INTO meetings(id, host_id, participants, date_added) VALUES($1, $2, $3, $4) ON CONFLICT (id) DO UPDATE SET participants = meetings.participants || excluded.participants',
-      [meetingId, hostId, JSON.stringify([participantName]), new Date()]
-    )
-  }
+  return client.query(
+    'INSERT INTO meetings(id, host_id, users, participants, date_added) VALUES($1, $2, $3, $4, $5) ON CONFLICT (id) DO UPDATE SET participants = meetings.participants || excluded.participants, users = meetings.users || excluded.users',
+    [
+      meetingId,
+      hostId,
+      JSON.stringify(userId ? [userId] : []),
+      JSON.stringify([participantName]),
+      new Date(),
+    ]
+  )
 }
 
 export async function removeParticipant(

@@ -131,6 +131,73 @@ describe('/hook route', () => {
     )
   })
 
+  it('adds a new meeting when a non-registered user joins first and a registered user follows', async () => {
+    const server = getTestServer()
+
+    await server.ready()
+
+    let meetings = await server.pg.query(
+      'SELECT users FROM meetings WHERE id=$1',
+      ['test_meeting_id_2']
+    )
+
+    expect(meetings.rows.length).toBe(0)
+
+    const response = await server.inject({
+      url: '/hook',
+      method: 'POST',
+      headers: {
+        Authorization: process.env.VERIFICATION_TOKEN,
+        clientid: process.env.CLIENT_ID,
+      },
+      payload: {
+        event: EVENT_PARTICIPANT_JOINED,
+        payload: {
+          object: {
+            id: 'test_meeting_id_2',
+            host_id: 'test_host_id',
+            participant: {
+              user_name: 'new user',
+            },
+          },
+        },
+      },
+    })
+
+    await server.inject({
+      url: '/hook',
+      method: 'POST',
+      headers: {
+        Authorization: process.env.VERIFICATION_TOKEN,
+        clientid: process.env.CLIENT_ID,
+      },
+      payload: {
+        event: EVENT_PARTICIPANT_JOINED,
+        payload: {
+          object: {
+            id: 'test_meeting_id_2',
+            host_id: 'test_host_id',
+            participant: {
+              id: 'new-user-id',
+              user_name: 'new user',
+            },
+          },
+        },
+      },
+    })
+
+    meetings = await server.pg.query(
+      'SELECT users, participants FROM meetings WHERE id=$1',
+      ['test_meeting_id_2']
+    )
+
+    expect(response.statusCode).toBe(200)
+    expect(meetings.rows[0].users).toContain('new-user-id')
+    expect(meetings.rows[0].participants).toContain(
+      '8a264073297f003d8b022801eaaaffaa'
+    )
+  })
+
   it('removes a meeting participant when they leave', async () => {
     const server = getTestServer()
 
