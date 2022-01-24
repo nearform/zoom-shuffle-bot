@@ -12,6 +12,7 @@
     "lint:fix": "eslint --fix .",
     "db:up": "docker-compose up -d",
     "db:migrate": "postgrator",
+    "db:populate": "postgrator --config=./postgrator-populate.json",
     "db:down": "docker-compose down",
     "db:connect": "docker-compose exec postgres psql -U postgres -d postgres"
   },
