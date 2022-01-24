@@ -16,8 +16,8 @@ import {
 import validateOptions from './helpers/validateOptions.js'
 import isTokenExpired from './helpers/isTokenExpired.js'
 import getTokenExpiresOn from './helpers/getTokenExpiresOn.js'
-
-const API_BASE_URL = 'https://api.zoom.us/v2'
+import verifyRequest from './verifyRequest.js'
+import { ZOOM_API_BASE_URL } from '../const.js'
 
 async function plugin(fastify, options = {}) {
   validateOptions(
@@ -47,54 +47,6 @@ async function plugin(fastify, options = {}) {
     }
   }
 
-  async function sendBotMessage({ toJid, accountId, content, isMarkdown }) {
-    const token = await getBotToken(accountId)
-
-    return apiFetch(token, '/im/chat/messages', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        robot_jid: options.botJid,
-        to_jid: toJid,
-        account_id: accountId,
-        content,
-        is_markdown_support: isMarkdown,
-      }),
-    })
-  }
-
-  async function verifyRequest(req) {
-    const { clientid, authorization } = req.headers
-
-    if (
-      clientid !== options.clientId ||
-      authorization !== options.verificationToken
-    ) {
-      throw createError(401)
-    }
-  }
-
-  async function authorize(code) {
-    const { access_token, refresh_token, expires_in } = await fetchTokenByCode(
-      options.clientId,
-      options.clientSecret,
-      options.redirectUri,
-      code
-    )
-
-    const { account_id } = await apiFetch(access_token, '/users/me')
-
-    await upsertApiTokenData(
-      fastify.pg,
-      account_id,
-      access_token,
-      refresh_token,
-      getTokenExpiresOn(expires_in)
-    )
-  }
-
   async function getApiToken(accountId) {
     const tokenData = await getApiTokenData(fastify.pg, accountId)
 
@@ -120,10 +72,47 @@ async function plugin(fastify, options = {}) {
     }
   }
 
+  async function sendBotMessage({ toJid, accountId, content, isMarkdown }) {
+    const token = await getBotToken(accountId)
+
+    return apiFetch(token, '/im/chat/messages', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        robot_jid: options.botJid,
+        to_jid: toJid,
+        account_id: accountId,
+        content,
+        is_markdown_support: isMarkdown,
+      }),
+    })
+  }
+
+  async function authorize(code) {
+    const { access_token, refresh_token, expires_in } = await fetchTokenByCode(
+      options.clientId,
+      options.clientSecret,
+      options.redirectUri,
+      code
+    )
+
+    const { account_id } = await apiFetch(access_token, '/users/me')
+
+    await upsertApiTokenData(
+      fastify.pg,
+      account_id,
+      access_token,
+      refresh_token,
+      getTokenExpiresOn(expires_in)
+    )
+  }
+
   async function apiFetch(token, endpoint, fetchOptions = {}) {
     const { headers = {} } = fetchOptions
 
-    const response = await fetch(`${API_BASE_URL}${endpoint}`, {
+    const response = await fetch(`${ZOOM_API_BASE_URL}${endpoint}`, {
       ...fetchOptions,
       headers: {
         Authorization: `Bearer ${token}`,
@@ -142,7 +131,7 @@ async function plugin(fastify, options = {}) {
 
   fastify.decorate('zoom', {
     sendBotMessage,
-    verifyRequest,
+    verifyRequest: verifyRequest.bind(null, options),
     authorize,
     fetch: async (accountId, endpoint) => {
       const token = await getApiToken(accountId)

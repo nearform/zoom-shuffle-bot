@@ -4,10 +4,11 @@ import {
   removeParticipant,
 } from '../services/db.js'
 import { encrypt } from '../helpers/crypto.js'
-
-const EVENT_PARTICIPANT_LEFT = 'meeting.participant_left'
-const EVENT_PARTICIPANT_JOINED = 'meeting.participant_joined'
-const EVENT_MEETING_ENDED = 'meeting.ended'
+import {
+  EVENT_MEETING_ENDED,
+  EVENT_PARTICIPANT_JOINED,
+  EVENT_PARTICIPANT_LEFT,
+} from '../const.js'
 
 export default async function (fastify) {
   fastify.post(

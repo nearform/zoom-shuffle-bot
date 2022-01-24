@@ -1,7 +1,6 @@
 import fetch from 'node-fetch'
 import createError from 'http-errors'
-
-const AUTH_BASE_URL = 'https://zoom.us/oauth/token'
+import { ZOOM_AUTH_BASE_URL } from '../const.js'
 
 async function fetchToken(clientId, clientSecret, params) {
   const basicAuth = Buffer.from(`${clientId}:${clientSecret}`).toString(
@@ -10,7 +9,7 @@ async function fetchToken(clientId, clientSecret, params) {
 
   const queryParams = new URLSearchParams(params)
 
-  const response = await fetch(`${AUTH_BASE_URL}?${queryParams}`, {
+  const response = await fetch(`${ZOOM_AUTH_BASE_URL}?${queryParams}`, {
     method: 'POST',
     headers: {
       Authorization: `Basic ${basicAuth}`,
