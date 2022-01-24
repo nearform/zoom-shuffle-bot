@@ -13,7 +13,7 @@ import {
 export default async function (fastify) {
   fastify.post(
     '/hook',
-    { onRequest: [fastify.zoom.verifyRequest] },
+    { onRequest: fastify.zoom.verifyRequest },
     async (req, res) => {
       const {
         event,
