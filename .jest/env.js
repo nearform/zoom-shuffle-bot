@@ -1,0 +1,6 @@
+process.env.CLIENT_ID = 'client_id'
+process.env.CLIENT_SECRET = 'client_secret'
+process.env.BOT_JID='zoom_bot_jid'
+process.env.VERIFICATION_TOKEN='zoom_verification_token'
+process.env.REDIRECT_URL='zoom_redirect_url'
+process.env.DATABASE_URL='postgres://postgres:postgres@localhost:5434/postgres'
