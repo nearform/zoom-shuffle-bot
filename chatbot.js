@@ -4,7 +4,7 @@ import buildServer from './server.js'
 dotenv.config()
 
 const server = buildServer({
-  log: true,
+  logger: true,
   databaseUrl: process.env.DATABASE_URL,
   clientId: process.env.CLIENT_ID,
   clientSecret: process.env.CLIENT_SECRET,
