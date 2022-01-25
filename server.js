@@ -1,6 +1,6 @@
 import Fastify from 'fastify'
 
-export default function buildServer(config = { logger: true }) {
+export default function buildServer(config) {
   const fastify = Fastify({ logger: config.logger })
 
   fastify.register(import('fastify-postgres'), {
