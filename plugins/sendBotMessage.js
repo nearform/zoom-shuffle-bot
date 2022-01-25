@@ -32,7 +32,7 @@ export default async function sendBotMessage(
   options,
   { toJid, accountId, content, isMarkdown }
 ) {
-  const token = await getBotToken(accountId)
+  const token = await getBotToken(fastify, options, accountId)
 
   return apiFetch(token, '/im/chat/messages', {
     method: 'POST',
