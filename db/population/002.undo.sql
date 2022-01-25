@@ -1,0 +1,2 @@
+TRUNCATE tokens;
+TRUNCATE meetings;
