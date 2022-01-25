@@ -22,7 +22,7 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "dotenv": "^11.0.0",
+    "dotenv": "^14.3.0",
     "fastify": "^3.25.3",
     "fastify-plugin": "^3.0.0",
     "fastify-postgres": "^3.6.0",
