@@ -6,11 +6,7 @@ import {
 } from '../../const.js'
 import resetDatabase from './resetDatabase.js'
 
-describe('/hook route', () => {
-  beforeEach(async () => {
-    await resetDatabase()
-  })
-
+describe('/hook route verification', () => {
   it('responds with 401 when not verified', async () => {
     const server = getTestServer()
 
@@ -37,6 +33,12 @@ describe('/hook route', () => {
     })
 
     expect(response.statusCode).toBe(200)
+  })
+})
+
+describe('/hook route logic', () => {
+  beforeEach(async () => {
+    await resetDatabase()
   })
 
   it('adds a meeting participant when a meeting is joined (and the meeting exists)', async () => {
