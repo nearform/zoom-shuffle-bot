@@ -23,7 +23,7 @@
   "license": "ISC",
   "dependencies": {
     "dotenv": "^14.3.2",
-    "fastify": "^3.25.3",
+    "fastify": "^3.27.0",
     "fastify-plugin": "^3.0.0",
     "fastify-postgres": "^3.6.0",
     "http-errors": "^2.0.0",
