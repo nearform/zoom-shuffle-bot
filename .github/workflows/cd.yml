@@ -5,7 +5,7 @@ on:
     branches: [master,chore/gcp-deploy]
 
 jobs:
-  deploy:
+  provision:
     runs-on: ubuntu-latest
 
     permissions:
@@ -21,3 +21,19 @@ jobs:
         with:
           workload_identity_provider: ${{ secrets.GCP_WORKLOAD_IDENTITY_PROVIDER }}
           service_account: ${{ secrets.GCP_SERVICE_ACCOUNT }}
+
+      - name: 'Set up Cloud SDK'
+        uses: google-github-actions/setup-gcloud@v0
+
+      - name: 'Provision Cloud SQL Instance'
+        run: >-
+          gcloud sql instances create production-postgres-instance 
+          --database-version=POSTGRES_14 
+          --cpu=2 
+          --memory=4GB 
+          --region=europe-west1
+
+      - name: 'Provision Cloud SQL Database'
+        run: >-
+          gcloud sql databases create zoom-shuffle-bot
+          --instance=production-postgres-instance
