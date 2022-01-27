@@ -13,6 +13,11 @@ jobs:
       id-token: write
 
     steps:
+      - name: 'Set environment variables'
+        run: |
+          echo "SQL_INSTANCE_NAME='production-postgres-instance'" >> $GITHUB_ENV
+          echo "SQL_DATABASE_NAME='zoom-shuffle-bot'" >> $GITHUB_ENV
+
       - uses: actions/checkout@v2
 
       - id: 'auth'
@@ -27,7 +32,7 @@ jobs:
 
       - name: 'Provision Cloud SQL Instance'
         run: >-
-          gcloud sql instances create production-postgres-instance 
+          gcloud sql instances create ${{ env.SQL_INSTANCE_NAME }}
           --database-version=POSTGRES_14 
           --cpu=2 
           --memory=4GB 
@@ -35,5 +40,5 @@ jobs:
 
       - name: 'Provision Cloud SQL Database'
         run: >-
-          gcloud sql databases create zoom-shuffle-bot
-          --instance=production-postgres-instance
+          gcloud sql databases create "${SQL_DATABASE_NAME}"
+          --instance="${SQL_INSTANCE_NAME}"
