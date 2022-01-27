@@ -15,7 +15,7 @@ jobs:
     steps:
       - name: 'Set environment variables'
         run: |
-          echo "SQL_INSTANCE_NAME='production-postgres-instance-2'" >> $GITHUB_ENV
+          echo "SQL_INSTANCE_NAME='production-postgres-instance'" >> $GITHUB_ENV
           echo "SQL_DATABASE_NAME='zoom-shuffle-bot'" >> $GITHUB_ENV
           echo "GCP_REGION='europe-west1'" >> $GITHUB_ENV
 
@@ -33,11 +33,11 @@ jobs:
 
       - name: 'Check if Cloud SQL Instance exists'
         run: >-
-          gcloud sql instances describe --format="value(name)" ${{ env.SQL_INSTANCE_NAME }} >/dev/null 2>/dev/null | 
-          echo "SQL_INSTANCE_PROVISIONED=$([[ $? = 0 ]] && echo 'true' || echo 'false')" >> $GITHUB_ENV
+          gcloud sql instances describe --format="value(name)" ${{ env.SQL_INSTANCE_NAME }} >/dev/null 2>/dev/null || 
+          echo "PROVISION_SQL_INSTANCE=true" >> $GITHUB_ENV
 
       - name: 'Provision Cloud SQL Instance'
-        if: env.SQL_INSTANCE_PROVISIONED != 'true'
+        if: env.PROVISION_SQL_INSTANCE == 'true'
         run: >-
           gcloud sql instances create ${{ env.SQL_INSTANCE_NAME }}
           --database-version=POSTGRES_14 
@@ -47,11 +47,11 @@ jobs:
 
       - name: 'Check if Cloud SQL Database exists'
         run: >-
-          gcloud sql databases describe --instance=${{ env.SQL_INSTANCE_NAME }} --format="value(name)" ${{ env.SQL_DATABASE_NAME }} >/dev/null 2>/dev/null | 
-          echo "SQL_DATABASE_PROVISIONED=$([[ $? = 0 ]] && echo 'true' || echo 'false')" >> $GITHUB_ENV
+          gcloud sql databases describe --instance=${{ env.SQL_INSTANCE_NAME }} --format="value(name)" ${{ env.SQL_DATABASE_NAME }} >/dev/null 2>/dev/null ||
+          echo "PROVISION_SQL_DATABASE=true" >> $GITHUB_ENV
 
       - name: 'Provision Cloud SQL Database'
-        if: env.SQL_DATABASE_PROVISIONED != 'true'
+        if: env.PROVISION_SQL_DATABASE == 'true'
         run: >-
           gcloud sql databases create ${{ env.SQL_DATABASE_NAME }}
           --instance=${{ env.SQL_INSTANCE_NAME }}
