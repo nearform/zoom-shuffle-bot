@@ -18,6 +18,7 @@ jobs:
           echo "SQL_INSTANCE_NAME='production-postgres-instance'" >> $GITHUB_ENV
           echo "SQL_DATABASE_NAME='zoom-shuffle-bot'" >> $GITHUB_ENV
           echo "GCP_REGION='europe-west1'" >> $GITHUB_ENV
+          echo "GCP_BUCKET_NAME='nearform-shuffle-zoom-bot-migrations'" >> $GITHUB_ENV
 
       - uses: actions/checkout@v2
 
@@ -59,5 +60,5 @@ jobs:
       - name: 'Import initial database migration'
         if: env.PROVISION_SQL_DATABASE == 'true'
         run: |
-          gcloud --quiet alpha storage cp db/migrations/001.do.sql gs://migrations
-          gcloud sql import sql ${{ env.SQL_INSTANCE_NAME }} gs://migrations/001.do.sql --database=${{ env.SQL_DATABASE_NAME }}
+          gcloud --quiet alpha storage cp db/migrations/001.do.sql gs://${{ env.GCP_BUCKET_NAME }}
+          gcloud sql import sql ${{ env.SQL_INSTANCE_NAME }} gs://${{ env.GCP_BUCKET_NAME }}/001.do.sql --database=${{ env.SQL_DATABASE_NAME }}
