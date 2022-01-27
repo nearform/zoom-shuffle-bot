@@ -55,3 +55,9 @@ jobs:
         run: >-
           gcloud sql databases create ${{ env.SQL_DATABASE_NAME }}
           --instance=${{ env.SQL_INSTANCE_NAME }}
+
+      - name: 'Import initial database migration'
+        if: env.PROVISION_SQL_DATABASE == 'true'
+        run: |
+          gcloud --quiet alpha storage cp db/migrations/001.do.sql gs://migrations
+          gcloud sql import sql ${{ env.SQL_INSTANCE_NAME }} gs://migrations/001.do.sql --database=${{ env.SQL_DATABASE_NAME }}
