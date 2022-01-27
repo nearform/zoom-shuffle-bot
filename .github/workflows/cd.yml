@@ -15,8 +15,9 @@ jobs:
     steps:
       - name: 'Set environment variables'
         run: |
-          echo "SQL_INSTANCE_NAME='production-postgres-instance'" >> $GITHUB_ENV
+          echo "SQL_INSTANCE_NAME='production-postgres-instance-2'" >> $GITHUB_ENV
           echo "SQL_DATABASE_NAME='zoom-shuffle-bot'" >> $GITHUB_ENV
+          echo "GCP_REGION='europe-west1'" >> $GITHUB_ENV
 
       - uses: actions/checkout@v2
 
@@ -42,7 +43,7 @@ jobs:
           --database-version=POSTGRES_14 
           --cpu=2 
           --memory=4GB 
-          --region=europe-west1
+          --region=${{ env.GCP_REGION }}
 
       - name: 'Check if Cloud SQL Database exists'
         run: >-
