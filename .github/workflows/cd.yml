@@ -30,10 +30,9 @@ jobs:
       - name: 'Set up Cloud SDK'
         uses: google-github-actions/setup-gcloud@v0
 
-
       - name: 'Check if Cloud SQL Instance exists'
         run: >-
-          gcloud sql instances describe --format="value(name)" "${{ env.SQL_INSTANCE_NAME }}" >/dev/null 2>/dev/null | 
+          gcloud sql instances describe --format="value(name)" ${{ env.SQL_INSTANCE_NAME }} >/dev/null 2>/dev/null | 
           echo "SQL_INSTANCE_PROVISIONED=$([[ $? = 0 ]] && echo 'true' || echo 'false')" >> $GITHUB_ENV
 
       - name: 'Provision Cloud SQL Instance'
@@ -45,7 +44,13 @@ jobs:
           --memory=4GB 
           --region=europe-west1
 
-      - name: 'Provision Cloud SQL Database'
+      - name: 'Check if Cloud SQL Database exists'
         run: >-
-          gcloud sql databases create "${SQL_DATABASE_NAME}"
-          --instance="${SQL_INSTANCE_NAME}"
+          gcloud sql databases describe --instance=${{ env.SQL_INSTANCE_NAME }} --format="value(name)" ${{ env.SQL_DATABASE_NAME }} >/dev/null 2>/dev/null | 
+          echo "SQL_DATABASE_PROVISIONED=$([[ $? = 0 ]] && echo 'true' || echo 'false')" >> $GITHUB_ENV
+
+      - name: 'Provision Cloud SQL Database'
+        if: env.SQL_DATABASE_PROVISIONED != 'true'
+        run: >-
+          gcloud sql databases create ${{ env.SQL_DATABASE_NAME }}
+          --instance=${{ env.SQL_INSTANCE_NAME }}
