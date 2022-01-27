@@ -30,7 +30,14 @@ jobs:
       - name: 'Set up Cloud SDK'
         uses: google-github-actions/setup-gcloud@v0
 
+
+      - name: 'Check if Cloud SQL Instance exists'
+        run: >-
+          gcloud sql instances describe --format="value(name)" "${{ env.SQL_INSTANCE_NAME }}" >/dev/null 2>/dev/null | 
+          echo "SQL_INSTANCE_PROVISIONED=$([[ $? = 0 ]] && echo 'true' || echo 'false')" >> $GITHUB_ENV
+
       - name: 'Provision Cloud SQL Instance'
+        if: env.SQL_INSTANCE_PROVISIONED != 'true'
         run: >-
           gcloud sql instances create ${{ env.SQL_INSTANCE_NAME }}
           --database-version=POSTGRES_14 
