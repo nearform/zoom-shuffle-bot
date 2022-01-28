@@ -5,12 +5,12 @@ export default function buildServer(config = { logger: true }) {
 
   fastify.register(import('fastify-postgres'), {
     connectionString: config.databaseUrl,
-    ssl:
-      process.env.NODE_ENV === 'development' || process.env.NODE_ENV === 'test'
-        ? false
-        : {
-            rejectUnauthorized: false,
-          },
+    ssl: false,
+    // process.env.NODE_ENV === 'development' || process.env.NODE_ENV === 'test'
+    //   ? false
+    //   : {
+    //       rejectUnauthorized: false,
+    //     },
   })
 
   fastify.register(import('./plugins/zoom.js'), config)
