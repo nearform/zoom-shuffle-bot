@@ -87,7 +87,7 @@ jobs:
           --source=.
           --set-env-vars='
           NODE_ENV=production,
-          DATABASE_URL=postgres://${{ env.SQL_ROOT_USERNAME }}:${{ secrets.SQL_ROOT_PASSWORD }}@/cloudsql${{ steps.sql_connection.connectionName }}/${{ env.SQL_DATABASE_NAME }},
+          DATABASE_URL=postgres://${{ env.SQL_ROOT_USERNAME }}:${{ secrets.SQL_ROOT_PASSWORD }}@/cloudsql${{ steps.sql_connection.outputs.connectionName }}/${{ env.SQL_DATABASE_NAME }},
           CLIENT_ID=${{ secrets.ZOOM_CLIENT_ID }},
           CLIENT_SECRET=${{ secrets.ZOOM_CLIENT_SECRET }},
           BOT_JID=${{ secrets.ZOOM_BOT_JID }},
@@ -95,12 +95,17 @@ jobs:
           VERIFICATION_TOKEN=${{ secrets.ZOOM_VERIFICATION_TOKEN }}
           '
 
+      - name: 'Retrieve the Cloud Run service url'
+        id: run_url
+        run: echo "::set-output name=url::$(gcloud run services describe ${{ env.RUN_SERVICE_NAME }} --region=${{ env.GCP_REGION }} --format="value(status.address.url)")"
+
       - name: 'Make the service public'
         run: >-
           gcloud run services add-iam-policy-binding ${{ env.RUN_SERVICE_NAME }}
           --member="allUsers"
           --role="roles/run.invoker"
+          --region=${{ env.GCP_REGION }}
 
       - name: 'Show summary'
         run: |
-          echo "App successfully deployed to: ${{ steps.deploy.outputs.url }}. Make sure that all settings in Zoom bot's configuration point at this url."
+          echo "App successfully deployed to: ${{ steps.run_url.outputs.url }}. Make sure that all settings in Zoom bot's configuration point at this url."
