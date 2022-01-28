@@ -91,7 +91,7 @@ jobs:
 
       - name: 'Retrieve the Cloud Run service url'
         id: run_url
-        run: echo "::set-output name=url::$(gcloud run services describe ${{ env.RUN_SERVICE_NAME }} --region=${{ env.GCP_REGION }} --format="value(status.address.url)")"
+        run: echo "::set-output name=url::$(gcloud run services describe ${{ env.RUN_SERVICE_NAME }} --region=${{ env.GCP_REGION }} --format="value(status.url)")"
 
       - name: 'Make the service public'
         run: >-
