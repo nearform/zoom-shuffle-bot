@@ -6,6 +6,7 @@ on:
 
 jobs:
   provision:
+    name: 'Provision and deploy'
     runs-on: ubuntu-latest
 
     permissions:
@@ -14,11 +15,13 @@ jobs:
 
     steps:
       - name: 'Set environment variables'
-        run: |
-          echo "SQL_INSTANCE_NAME='production-postgres-instance'" >> $GITHUB_ENV
-          echo "SQL_DATABASE_NAME='zoom-shuffle-bot'" >> $GITHUB_ENV
-          echo "GCP_REGION='europe-west1'" >> $GITHUB_ENV
-          echo "GCP_BUCKET_NAME='nearform-shuffle-zoom-bot-migrations'" >> $GITHUB_ENV
+        run: >-
+          echo "
+          SQL_INSTANCE_NAME='production-postgres-instance'
+          SQL_DATABASE_NAME='zoom-shuffle-bot'
+          GCP_REGION='europe-west1'
+          RUN_SERVICE_NAME='zoom-shuffle-bot'
+          " >> $GITHUB_ENV
 
       - uses: actions/checkout@v2
 
@@ -34,8 +37,10 @@ jobs:
 
       - name: 'Check if Cloud SQL Instance exists'
         run: >-
-          gcloud sql instances describe --format="value(name)" ${{ env.SQL_INSTANCE_NAME }} >/dev/null 2>/dev/null || 
-          echo "PROVISION_SQL_INSTANCE=true" >> $GITHUB_ENV
+          gcloud sql instances describe ${{ env.SQL_INSTANCE_NAME }} 
+          --format="value(name)" 
+          >/dev/null 2>/dev/null # ignore the output
+          || echo "PROVISION_SQL_INSTANCE=true" >> $GITHUB_ENV # set env var only when the command fails
 
       - name: 'Provision Cloud SQL Instance'
         if: env.PROVISION_SQL_INSTANCE == 'true'
@@ -45,11 +50,15 @@ jobs:
           --cpu=2 
           --memory=4GB 
           --region=${{ env.GCP_REGION }}
+          --root-password=${{ secrets.SQL_ROOT_PASSWORD }}
 
       - name: 'Check if Cloud SQL Database exists'
         run: >-
-          gcloud sql databases describe --instance=${{ env.SQL_INSTANCE_NAME }} --format="value(name)" ${{ env.SQL_DATABASE_NAME }} >/dev/null 2>/dev/null ||
-          echo "PROVISION_SQL_DATABASE=true" >> $GITHUB_ENV
+          gcloud sql databases describe ${{ env.SQL_DATABASE_NAME }}
+          --instance=${{ env.SQL_INSTANCE_NAME }} 
+          --format="value(name)"  
+          >/dev/null 2>/dev/null # ignore the output
+          || echo "PROVISION_SQL_DATABASE=true" >> $GITHUB_ENV # set env var only when the command fails
 
       - name: 'Provision Cloud SQL Database'
         if: env.PROVISION_SQL_DATABASE == 'true'
@@ -57,8 +66,7 @@ jobs:
           gcloud sql databases create ${{ env.SQL_DATABASE_NAME }}
           --instance=${{ env.SQL_INSTANCE_NAME }}
 
-      - name: 'Import initial database migration'
-        if: env.PROVISION_SQL_DATABASE == 'true'
-        run: |
-          gcloud --quiet alpha storage cp db/migrations/001.do.sql gs://${{ env.GCP_BUCKET_NAME }}
-          gcloud sql import sql ${{ env.SQL_INSTANCE_NAME }} gs://${{ env.GCP_BUCKET_NAME }}/001.do.sql --database=${{ env.SQL_DATABASE_NAME }}
+#      - name: 'Deploy to Cloud Run'
+#        uses: 'google-github-actions/deploy-cloudrun@v0'
+#        with:
+#          service: ${{ env.RUN_SERVICE_NAME }}
