@@ -87,7 +87,7 @@ jobs:
           flags: --set-cloudsql-instances=${{ env.SQL_INSTANCE_NAME }}
           env_vars: >-
             NODE_ENV=production,
-            DATABASE_URL=postgres://${{ SQL_ROOT_USERNAME }}:${{ secrets.SQL_ROOT_PASSWORD }}@$/cloudsql/${{ steps.sql_connection.connectionName }}/${{ env.SQL_DATABASE_NAME }}
+            DATABASE_URL=postgres://${{ env.SQL_ROOT_USERNAME }}:${{ secrets.SQL_ROOT_PASSWORD }}@$/cloudsql/${{ steps.sql_connection.connectionName }}/${{ env.SQL_DATABASE_NAME }}
             
       - name: 'Make the service public'
         run: >-
