@@ -15,18 +15,15 @@ jobs:
 
     steps:
       - name: 'Set environment variables'
-        run: >-
-          echo "
-          SQL_INSTANCE_NAME='production-postgres-instance'
-          SQL_DATABASE_NAME='zoom-shuffle-bot'
-          GCP_REGION='europe-west1'
-          RUN_SERVICE_NAME='zoom-shuffle-bot'
-          " >> $GITHUB_ENV
+        run: |
+          echo "SQL_INSTANCE_NAME=production-postgres-instance-2" >> $GITHUB_ENV
+          echo "SQL_DATABASE_NAME=zoom-shuffle-bot" >> $GITHUB_ENV
+          echo "GCP_REGION=europe-west1" >> $GITHUB_ENV
+          echo "RUN_SERVICE_NAME=zoom-shuffle-bot" >> $GITHUB_ENV
 
       - uses: actions/checkout@v2
 
-      - id: 'auth'
-        name: 'Authenticate with GCP'
+      - name: 'Authenticate with GCP'
         uses: google-github-actions/auth@v0
         with:
           workload_identity_provider: ${{ secrets.GCP_WORKLOAD_IDENTITY_PROVIDER }}
@@ -66,7 +63,31 @@ jobs:
           gcloud sql databases create ${{ env.SQL_DATABASE_NAME }}
           --instance=${{ env.SQL_INSTANCE_NAME }}
 
-#      - name: 'Deploy to Cloud Run'
-#        uses: 'google-github-actions/deploy-cloudrun@v0'
-#        with:
-#          service: ${{ env.RUN_SERVICE_NAME }}
+      - name: 'Authorize Docker push'
+        run: gcloud auth configure-docker
+
+      - name: 'Build and Push Container'
+        run: |-
+          docker build -t gcr.io/${{ env.RUN_SERVICE_NAME }}:${{ github.sha }} ./
+          docker push gcr.io/${{ env.RUN_SERVICE_NAME }}:${{ github.sha }}
+
+      - name: 'Retrieve the Cloud SQL connection name'
+        id: sql_connection
+        run: echo "::set-output name=connectionName::$(gcloud sql instances describe --format="value(connectionName)" ${{ env.SQL_INSTANCE_NAME }})"
+
+      - name: 'Deploy to Cloud Run'
+        id: deploy
+        uses: 'google-github-actions/deploy-cloudrun@v0'
+        with:
+          service: ${{ env.RUN_SERVICE_NAME }}
+          image: gcr.io/${{ env.RUN_SERVICE_NAME }}:${{ github.sha }}
+          region: ${{ env.GCP_REGION }}
+          flags: --set-cloudsql-instances=${{ env.SQL_INSTANCE_NAME }}
+          env_vars: >-
+            NODE_ENV=production,
+            DATABASE_URL=postgres://postgres:${{ secrets.SQL_ROOT_PASSWORD }}@$/cloudsql/${{ steps.sql_connection.connectionName }}/${{ env.SQL_DATABASE_NAME }}
+            
+
+      - name: 'Show summary'
+        run: |
+          echo "App successfully deployed to: ${{ steps.deploy.outputs.url }}. Make sure that all settings in Zoom bot's configuration point at this url."
