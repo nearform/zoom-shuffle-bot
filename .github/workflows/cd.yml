@@ -84,7 +84,7 @@ jobs:
           service: ${{ env.RUN_SERVICE_NAME }}
 #          image: gcr.io/${{ env.GCP_PROJECT_ID }}/${{ env.RUN_SERVICE_NAME }}:${{ github.sha }}
           region: ${{ env.GCP_REGION }}
-          flags: --set-cloudsql-instances=${{ env.SQL_INSTANCE_NAME }}
+          flags: --set-cloudsql-instances=${{ env.SQL_INSTANCE_NAME }} --source=.
           env_vars: >-
             NODE_ENV=production,
             DATABASE_URL=postgres://${{ env.SQL_ROOT_USERNAME }}:${{ secrets.SQL_ROOT_PASSWORD }}@$/cloudsql/${{ steps.sql_connection.connectionName }}/${{ env.SQL_DATABASE_NAME }}
