@@ -16,6 +16,7 @@ jobs:
     steps:
       - name: 'Set environment variables'
         run: |
+          echo "GCP_PROJECT_ID=shuffle-zoom-bot" >> $GITHUB_ENV
           echo "SQL_INSTANCE_NAME=production-postgres-instance-3" >> $GITHUB_ENV
           echo "SQL_DATABASE_NAME=zoom-shuffle-bot" >> $GITHUB_ENV
           echo "GCP_REGION=europe-west1" >> $GITHUB_ENV
@@ -68,8 +69,8 @@ jobs:
 
       - name: 'Build and Push Container'
         run: |-
-          docker build -t gcr.io/${{ env.RUN_SERVICE_NAME }}:${{ github.sha }} ./
-          docker push gcr.io/${{ env.RUN_SERVICE_NAME }}:${{ github.sha }}
+          docker build -t gcr.io/${{ env.GCP_PROJECT_ID }}/${{ env.RUN_SERVICE_NAME }}:${{ github.sha }} ./
+          docker push gcr.io/${{ env.GCP_PROJECT_ID }}/${{ env.RUN_SERVICE_NAME }}:${{ github.sha }}
 
       - name: 'Retrieve the Cloud SQL connection name'
         id: sql_connection
@@ -80,13 +81,18 @@ jobs:
         uses: 'google-github-actions/deploy-cloudrun@v0'
         with:
           service: ${{ env.RUN_SERVICE_NAME }}
-          image: gcr.io/${{ env.RUN_SERVICE_NAME }}:${{ github.sha }}
+          image: gcr.io/${{ env.GCP_PROJECT_ID }}/${{ env.RUN_SERVICE_NAME }}:${{ github.sha }}
           region: ${{ env.GCP_REGION }}
           flags: --set-cloudsql-instances=${{ env.SQL_INSTANCE_NAME }}
           env_vars: >-
             NODE_ENV=production,
             DATABASE_URL=postgres://postgres:${{ secrets.SQL_ROOT_PASSWORD }}@$/cloudsql/${{ steps.sql_connection.connectionName }}/${{ env.SQL_DATABASE_NAME }}
             
+      - name: 'Make the service public'
+        run: >-
+          gcloud run services add-iam-policy-binding ${{ env.RUN_SERVICE_NAME }}
+          --member="allUsers"
+          --role="roles/run.invoker"
 
       - name: 'Show summary'
         run: |
