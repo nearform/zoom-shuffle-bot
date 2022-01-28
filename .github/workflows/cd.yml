@@ -87,7 +87,7 @@ jobs:
           --source=.
           --set-env-vars='
           NODE_ENV=production,
-          DATABASE_URL=postgres://${{ env.SQL_ROOT_USERNAME }}:${{ secrets.SQL_ROOT_PASSWORD }}@/cloudsql${{ steps.sql_connection.connectionName }}/${{ env.SQL_DATABASE_NAME }}
+          DATABASE_URL=postgres://${{ env.SQL_ROOT_USERNAME }}:${{ secrets.SQL_ROOT_PASSWORD }}@/cloudsql${{ steps.sql_connection.connectionName }}/${{ env.SQL_DATABASE_NAME }},
           CLIENT_ID=${{ secrets.ZOOM_CLIENT_ID }},
           CLIENT_SECRET=${{ secrets.ZOOM_CLIENT_SECRET }},
           BOT_JID=${{ secrets.ZOOM_BOT_JID }},
