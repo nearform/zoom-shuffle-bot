@@ -36,8 +36,8 @@ jobs:
         run: >-
           gcloud sql instances describe ${{ env.SQL_INSTANCE_NAME }} 
           --format="value(name)" 
-          >/dev/null 2>/dev/null # ignore the output
-          || echo "PROVISION_SQL_INSTANCE=true" >> $GITHUB_ENV # set env var only when the command fails
+          >/dev/null 2>/dev/null
+          || echo "PROVISION_SQL_INSTANCE=true" >> $GITHUB_ENV
 
       - name: 'Provision Cloud SQL Instance'
         if: env.PROVISION_SQL_INSTANCE == 'true'
@@ -54,8 +54,8 @@ jobs:
           gcloud sql databases describe ${{ env.SQL_DATABASE_NAME }}
           --instance=${{ env.SQL_INSTANCE_NAME }} 
           --format="value(name)"  
-          >/dev/null 2>/dev/null # ignore the output
-          || echo "PROVISION_SQL_DATABASE=true" >> $GITHUB_ENV # set env var only when the command fails
+          >/dev/null 2>/dev/null
+          || echo "PROVISION_SQL_DATABASE=true" >> $GITHUB_ENV
 
       - name: 'Provision Cloud SQL Database'
         if: env.PROVISION_SQL_DATABASE == 'true'
