@@ -74,7 +74,6 @@ jobs:
 
       - name: 'Deploy to Cloud Run'
         id: deploy
-#        uses: 'google-github-actions/deploy-cloudrun@v0'
         run: >-
           gcloud run deploy ${{ env.RUN_SERVICE_NAME }}
           --region=${{ env.GCP_REGION }}
@@ -82,7 +81,6 @@ jobs:
           --source=.
           --set-env-vars='
           NODE_ENV=production,
-          DATABASE_URL=postgres://${{ env.SQL_ROOT_USERNAME }}:${{ secrets.SQL_ROOT_PASSWORD }}@/cloudsql/${{ steps.sql_connection.outputs.connectionName }}/${{ env.SQL_DATABASE_NAME }},
           DB_USER=${{ env.SQL_ROOT_USERNAME }},
           DB_PASSWORD=${{ secrets.SQL_ROOT_PASSWORD }},
           DB_HOST=/cloudsql/${{ steps.sql_connection.outputs.connectionName }},

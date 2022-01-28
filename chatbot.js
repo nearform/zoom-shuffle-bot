@@ -6,6 +6,10 @@ dotenv.config()
 const server = buildServer({
   logger: true,
   databaseUrl: process.env.DATABASE_URL,
+  dbUser: process.env.DB_USER,
+  dbPassword: process.env.DB_PASSWORD,
+  dbHost: process.env.DB_HOST,
+  dbName: process.env.DB_NAME,
   clientId: process.env.CLIENT_ID,
   clientSecret: process.env.CLIENT_SECRET,
   botJid: process.env.BOT_JID,
