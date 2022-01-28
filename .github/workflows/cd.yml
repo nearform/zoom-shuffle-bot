@@ -68,11 +68,6 @@ jobs:
       - name: 'Authorize Docker push'
         run: gcloud auth configure-docker
 
-#      - name: 'Build and Push Container'
-#        run: |-
-#          docker build -t gcr.io/${{ env.GCP_PROJECT_ID }}/${{ env.RUN_SERVICE_NAME }}:${{ github.sha }} ./
-#          docker push gcr.io/${{ env.GCP_PROJECT_ID }}/${{ env.RUN_SERVICE_NAME }}:${{ github.sha }}
-
       - name: 'Retrieve the Cloud SQL connection name'
         id: sql_connection
         run: echo "::set-output name=connectionName::$(gcloud sql instances describe --format="value(connectionName)" ${{ env.SQL_INSTANCE_NAME }})"
@@ -87,13 +82,12 @@ jobs:
           --source=.
           --set-env-vars='
           NODE_ENV=production,
-          DATABASE_URL=postgres://${{ env.SQL_ROOT_USERNAME }}:${{ secrets.SQL_ROOT_PASSWORD }}@/cloudsql${{ steps.sql_connection.outputs.connectionName }}/${{ env.SQL_DATABASE_NAME }},
+          DATABASE_URL=postgres://${{ env.SQL_ROOT_USERNAME }}:${{ secrets.SQL_ROOT_PASSWORD }}@/cloudsql/${{ steps.sql_connection.outputs.connectionName }}/${{ env.SQL_DATABASE_NAME }},
           CLIENT_ID=${{ secrets.ZOOM_CLIENT_ID }},
           CLIENT_SECRET=${{ secrets.ZOOM_CLIENT_SECRET }},
           BOT_JID=${{ secrets.ZOOM_BOT_JID }},
           REDIRECT_URL=${{ secrets.ZOOM_REDIRECT_URL }},
-          VERIFICATION_TOKEN=${{ secrets.ZOOM_VERIFICATION_TOKEN }}
-          '
+          VERIFICATION_TOKEN=${{ secrets.ZOOM_VERIFICATION_TOKEN }}'
 
       - name: 'Retrieve the Cloud Run service url'
         id: run_url
