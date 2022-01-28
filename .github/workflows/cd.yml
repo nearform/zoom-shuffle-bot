@@ -85,7 +85,15 @@ jobs:
           --region=${{ env.GCP_REGION }}
           --set-cloudsql-instances=${{ env.SQL_INSTANCE_NAME }} 
           --source=.
-          --set-env-vars=NODE_ENV=production,DATABASE_URL=postgres://${{ env.SQL_ROOT_USERNAME }}:${{ secrets.SQL_ROOT_PASSWORD }}@/cloudsql${{ steps.sql_connection.connectionName }}/${{ env.SQL_DATABASE_NAME }}
+          --set-env-vars='
+          NODE_ENV=production,
+          DATABASE_URL=postgres://${{ env.SQL_ROOT_USERNAME }}:${{ secrets.SQL_ROOT_PASSWORD }}@/cloudsql${{ steps.sql_connection.connectionName }}/${{ env.SQL_DATABASE_NAME }}
+          CLIENT_ID=${{ secrets.ZOOM_CLIENT_ID }},
+          CLIENT_SECRET=${{ secrets.ZOOM_CLIENT_SECRET }},
+          BOT_JID=${{ secrets.ZOOM_BOT_JID }},
+          REDIRECT_URL=${{ secrets.ZOOM_REDIRECT_URL }},
+          VERIFICATION_TOKEN=${{ secrets.ZOOM_VERIFICATION_TOKEN }}
+          '
 
       - name: 'Make the service public'
         run: >-
