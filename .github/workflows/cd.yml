@@ -16,7 +16,7 @@ jobs:
     steps:
       - name: 'Set environment variables'
         run: |
-          echo "SQL_INSTANCE_NAME=production-postgres-instance-2" >> $GITHUB_ENV
+          echo "SQL_INSTANCE_NAME=production-postgres-instance-3" >> $GITHUB_ENV
           echo "SQL_DATABASE_NAME=zoom-shuffle-bot" >> $GITHUB_ENV
           echo "GCP_REGION=europe-west1" >> $GITHUB_ENV
           echo "RUN_SERVICE_NAME=zoom-shuffle-bot" >> $GITHUB_ENV
