@@ -19,6 +19,7 @@ jobs:
           echo "GCP_PROJECT_ID=shuffle-zoom-bot" >> $GITHUB_ENV
           echo "SQL_INSTANCE_NAME=production-postgres-instance-3" >> $GITHUB_ENV
           echo "SQL_DATABASE_NAME=zoom-shuffle-bot" >> $GITHUB_ENV
+          echo "SQL_ROOT_USERNAME=postgres" >> $GITHUB_ENV
           echo "GCP_REGION=europe-west1" >> $GITHUB_ENV
           echo "RUN_SERVICE_NAME=zoom-shuffle-bot" >> $GITHUB_ENV
 
@@ -67,10 +68,10 @@ jobs:
       - name: 'Authorize Docker push'
         run: gcloud auth configure-docker
 
-      - name: 'Build and Push Container'
-        run: |-
-          docker build -t gcr.io/${{ env.GCP_PROJECT_ID }}/${{ env.RUN_SERVICE_NAME }}:${{ github.sha }} ./
-          docker push gcr.io/${{ env.GCP_PROJECT_ID }}/${{ env.RUN_SERVICE_NAME }}:${{ github.sha }}
+#      - name: 'Build and Push Container'
+#        run: |-
+#          docker build -t gcr.io/${{ env.GCP_PROJECT_ID }}/${{ env.RUN_SERVICE_NAME }}:${{ github.sha }} ./
+#          docker push gcr.io/${{ env.GCP_PROJECT_ID }}/${{ env.RUN_SERVICE_NAME }}:${{ github.sha }}
 
       - name: 'Retrieve the Cloud SQL connection name'
         id: sql_connection
@@ -81,12 +82,12 @@ jobs:
         uses: 'google-github-actions/deploy-cloudrun@v0'
         with:
           service: ${{ env.RUN_SERVICE_NAME }}
-          image: gcr.io/${{ env.GCP_PROJECT_ID }}/${{ env.RUN_SERVICE_NAME }}:${{ github.sha }}
+#          image: gcr.io/${{ env.GCP_PROJECT_ID }}/${{ env.RUN_SERVICE_NAME }}:${{ github.sha }}
           region: ${{ env.GCP_REGION }}
           flags: --set-cloudsql-instances=${{ env.SQL_INSTANCE_NAME }}
           env_vars: >-
             NODE_ENV=production,
-            DATABASE_URL=postgres://postgres:${{ secrets.SQL_ROOT_PASSWORD }}@$/cloudsql/${{ steps.sql_connection.connectionName }}/${{ env.SQL_DATABASE_NAME }}
+            DATABASE_URL=postgres://${{ SQL_ROOT_USERNAME }}:${{ secrets.SQL_ROOT_PASSWORD }}@$/cloudsql/${{ steps.sql_connection.connectionName }}/${{ env.SQL_DATABASE_NAME }}
             
       - name: 'Make the service public'
         run: >-
