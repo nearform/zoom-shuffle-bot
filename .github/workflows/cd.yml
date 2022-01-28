@@ -84,8 +84,7 @@ jobs:
           gcloud run deploy ${{ env.RUN_SERVICE_NAME }}
           --region=${{ env.GCP_REGION }}
           --set-cloudsql-instances=${{ env.SQL_INSTANCE_NAME }} 
-          --source=.
-          --set-env-vars=NODE_ENV=production,DATABASE_URL=postgres://${{ env.SQL_ROOT_USERNAME }}:${{ secrets.SQL_ROOT_PASSWORD }}@$/cloudsql/${{ steps.sql_connection.connectionName }}/${{ env.SQL_DATABASE_NAME }}
+          --set-env-vars=NODE_ENV=production,DATABASE_URL=postgres://${{ env.SQL_ROOT_USERNAME }}:${{ secrets.SQL_ROOT_PASSWORD }}@/cloudsql${{ steps.sql_connection.connectionName }}/${{ env.SQL_DATABASE_NAME }}
 
       - name: 'Make the service public'
         run: >-
