@@ -82,7 +82,8 @@ jobs:
           --region=${{ env.GCP_REGION }}
           --cpu=${{ env.RUN_CPU }}
           --memory=${{ env.RUN_MEM }}
-          --set-cloudsql-instances=${{ env.SQL_INSTANCE_NAME }} 
+          --set-cloudsql-instances=${{ env.SQL_INSTANCE_NAME }}
+          --revision-suffix=${{ github.sha }}
           --source=.
           --set-env-vars='
           NODE_ENV=production,
