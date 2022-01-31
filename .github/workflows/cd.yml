@@ -2,7 +2,7 @@ name: cd
 
 on:
   push:
-    branches: [master]
+    branches: [master,feat/gcp-db-migration]
 
 jobs:
   provision:
@@ -18,12 +18,12 @@ jobs:
         run: |
           echo "GCP_PROJECT_ID=shuffle-zoom-bot" >> $GITHUB_ENV
           echo "GCP_REGION=europe-west1" >> $GITHUB_ENV
-          echo "SQL_INSTANCE_NAME=production-postgres" >> $GITHUB_ENV
+          echo "SQL_INSTANCE_NAME=test-postgres" >> $GITHUB_ENV
           echo "SQL_INSTANCE_CPU=2" >> $GITHUB_ENV
           echo "SQL_INSTANCE_MEM=4GB" >> $GITHUB_ENV
           echo "SQL_DATABASE_NAME=zoom-shuffle-bot" >> $GITHUB_ENV
           echo "SQL_ROOT_USERNAME=postgres" >> $GITHUB_ENV
-          echo "RUN_SERVICE_NAME=zoom-shuffle-bot" >> $GITHUB_ENV
+          echo "RUN_SERVICE_NAME=zoom-shuffle-bot-test" >> $GITHUB_ENV
           echo "RUN_CPU=1" >> $GITHUB_ENV
           echo "RUN_MEM=2G" >> $GITHUB_ENV
 
@@ -95,7 +95,8 @@ jobs:
           CLIENT_SECRET=${{ secrets.ZOOM_CLIENT_SECRET }},
           BOT_JID=${{ secrets.ZOOM_BOT_JID }},
           REDIRECT_URL=${{ secrets.ZOOM_REDIRECT_URL }},
-          VERIFICATION_TOKEN=${{ secrets.ZOOM_VERIFICATION_TOKEN }}'
+          VERIFICATION_TOKEN=${{ secrets.ZOOM_VERIFICATION_TOKEN }},
+          MIGRATE_DB=${{ env.PROVISION_SQL_DATABASE }}'
 
       - name: 'Retrieve the Cloud Run service url'
         run: echo "RUN_URL=$(gcloud run services describe ${{ env.RUN_SERVICE_NAME }} --region=${{ env.GCP_REGION }} --format="value(status.url)")" >> $GITHUB_ENV
