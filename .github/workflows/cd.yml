@@ -69,8 +69,7 @@ jobs:
         run: gcloud auth configure-docker
 
       - name: 'Retrieve the Cloud SQL connection name'
-        id: sql_connection
-        run: echo "::set-output name=connectionName::$(gcloud sql instances describe --format="value(connectionName)" ${{ env.SQL_INSTANCE_NAME }})"
+        run: echo "SQL_HOST=/cloudsql/$(gcloud sql instances describe --format="value(connectionName)" ${{ env.SQL_INSTANCE_NAME }})" >> $GITHUB_ENV
 
       - name: 'Deploy to Cloud Run'
         id: deploy
@@ -85,7 +84,7 @@ jobs:
           NODE_ENV=production,
           DB_USER=${{ env.SQL_ROOT_USERNAME }},
           DB_PASSWORD=${{ secrets.SQL_ROOT_PASSWORD }},
-          DB_HOST=/cloudsql/${{ steps.sql_connection.outputs.connectionName }},
+          DB_HOST=${{ env.SQL_HOST }},
           DB_NAME=${{ env.SQL_DATABASE_NAME }},
           CLIENT_ID=${{ secrets.ZOOM_CLIENT_ID }},
           CLIENT_SECRET=${{ secrets.ZOOM_CLIENT_SECRET }},
@@ -94,8 +93,7 @@ jobs:
           VERIFICATION_TOKEN=${{ secrets.ZOOM_VERIFICATION_TOKEN }}'
 
       - name: 'Retrieve the Cloud Run service url'
-        id: run_url
-        run: echo "::set-output name=url::$(gcloud run services describe ${{ env.RUN_SERVICE_NAME }} --region=${{ env.GCP_REGION }} --format="value(status.url)")"
+        run: echo "RUN_URL=$(gcloud run services describe ${{ env.RUN_SERVICE_NAME }} --region=${{ env.GCP_REGION }} --format="value(status.url)")" >> $GITHUB_ENV
 
       - name: 'Make the service public'
         run: >-
@@ -106,4 +104,4 @@ jobs:
 
       - name: 'Show summary'
         run: |
-          echo "App successfully deployed to: ${{ steps.run_url.outputs.url }}. Make sure that all settings in Zoom bot's configuration point at this url."
+          echo "App successfully deployed to: ${{ env.RUN_URL }}.\n Make sure that all settings in Zoom bot's configuration point at this url."
