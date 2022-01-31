@@ -2,7 +2,7 @@ name: cd
 
 on:
   push:
-    branches: [master,chore/gcp-deploy]
+    branches: [master]
 
 jobs:
   provision:
@@ -17,10 +17,10 @@ jobs:
       - name: 'Set environment variables'
         run: |
           echo "GCP_PROJECT_ID=shuffle-zoom-bot" >> $GITHUB_ENV
-          echo "SQL_INSTANCE_NAME=production-postgres-instance-3" >> $GITHUB_ENV
+          echo "GCP_REGION=europe-west1" >> $GITHUB_ENV
+          echo "SQL_INSTANCE_NAME=production-postgres" >> $GITHUB_ENV
           echo "SQL_DATABASE_NAME=zoom-shuffle-bot" >> $GITHUB_ENV
           echo "SQL_ROOT_USERNAME=postgres" >> $GITHUB_ENV
-          echo "GCP_REGION=europe-west1" >> $GITHUB_ENV
           echo "RUN_SERVICE_NAME=zoom-shuffle-bot" >> $GITHUB_ENV
 
       - uses: actions/checkout@v2
@@ -46,7 +46,7 @@ jobs:
         run: >-
           gcloud sql instances create ${{ env.SQL_INSTANCE_NAME }}
           --database-version=POSTGRES_14 
-          --cpu=2 
+          --cpu=2
           --memory=4GB 
           --region=${{ env.GCP_REGION }}
           --root-password=${{ secrets.SQL_ROOT_PASSWORD }}
@@ -77,6 +77,8 @@ jobs:
         run: >-
           gcloud run deploy ${{ env.RUN_SERVICE_NAME }}
           --region=${{ env.GCP_REGION }}
+          --cpu=1
+          --memory=2GB
           --set-cloudsql-instances=${{ env.SQL_INSTANCE_NAME }} 
           --source=.
           --set-env-vars='
