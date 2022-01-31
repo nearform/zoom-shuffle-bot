@@ -2,7 +2,7 @@ name: cd
 
 on:
   push:
-    branches: [master, chore/gcp-deploy]
+    branches: [master]
 
 jobs:
   provision:
