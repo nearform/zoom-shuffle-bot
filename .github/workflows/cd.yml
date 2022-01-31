@@ -25,7 +25,7 @@ jobs:
           echo "SQL_ROOT_USERNAME=postgres" >> $GITHUB_ENV
           echo "RUN_SERVICE_NAME=zoom-shuffle-bot" >> $GITHUB_ENV
           echo "RUN_CPU=1" >> $GITHUB_ENV
-          echo "RUN_MEM=2GB" >> $GITHUB_ENV
+          echo "RUN_MEM=2G" >> $GITHUB_ENV
 
       - uses: actions/checkout@v2
 
