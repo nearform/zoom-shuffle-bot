@@ -3,14 +3,20 @@ import Fastify from 'fastify'
 export default function buildServer(config = { logger: true }) {
   const fastify = Fastify({ logger: config.logger })
 
+  const databaseConnectionSettings = config.databaseUrl
+    ? {
+        connectionString: config.databaseUrl,
+      }
+    : {
+        user: config.dbUser,
+        password: config.dbPassword,
+        host: config.dbHost,
+        database: config.dbName,
+      }
+
   fastify.register(import('fastify-postgres'), {
-    connectionString: config.databaseUrl,
-    ssl:
-      process.env.NODE_ENV === 'development' || process.env.NODE_ENV === 'test'
-        ? false
-        : {
-            rejectUnauthorized: false,
-          },
+    ...databaseConnectionSettings,
+    ssl: false,
   })
 
   fastify.register(import('./plugins/zoom.js'), config)
