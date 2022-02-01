@@ -2,7 +2,7 @@ name: cd
 
 on:
   push:
-    branches: [master,feat/gcp-db-migration]
+    branches: [master]
 
 jobs:
   provision:
@@ -18,12 +18,12 @@ jobs:
         run: |
           echo "GCP_PROJECT_ID=shuffle-zoom-bot" >> $GITHUB_ENV
           echo "GCP_REGION=europe-west1" >> $GITHUB_ENV
-          echo "SQL_INSTANCE_NAME=test-postgres" >> $GITHUB_ENV
+          echo "SQL_INSTANCE_NAME=production-postgres" >> $GITHUB_ENV
           echo "SQL_INSTANCE_CPU=2" >> $GITHUB_ENV
           echo "SQL_INSTANCE_MEM=4GB" >> $GITHUB_ENV
           echo "SQL_DATABASE_NAME=zoom-shuffle-bot" >> $GITHUB_ENV
           echo "SQL_ROOT_USERNAME=postgres" >> $GITHUB_ENV
-          echo "RUN_SERVICE_NAME=zoom-shuffle-bot-test" >> $GITHUB_ENV
+          echo "RUN_SERVICE_NAME=zoom-shuffle-bot" >> $GITHUB_ENV
           echo "RUN_CPU=1" >> $GITHUB_ENV
           echo "RUN_MEM=2G" >> $GITHUB_ENV
 
