@@ -2,7 +2,7 @@ name: cd
 
 on:
   push:
-    branches: [master, feat/gcp-db-migration]
+    branches: [master]
 
 jobs:
   provision:
