@@ -95,8 +95,7 @@ jobs:
           CLIENT_SECRET=${{ secrets.ZOOM_CLIENT_SECRET }},
           BOT_JID=${{ secrets.ZOOM_BOT_JID }},
           REDIRECT_URL=${{ secrets.ZOOM_REDIRECT_URL }},
-          VERIFICATION_TOKEN=${{ secrets.ZOOM_VERIFICATION_TOKEN }},
-          MIGRATE_DB=${{ env.PROVISION_SQL_DATABASE }}'
+          VERIFICATION_TOKEN=${{ secrets.ZOOM_VERIFICATION_TOKEN }}'
 
       - name: 'Retrieve the Cloud Run service url'
         run: echo "RUN_URL=$(gcloud run services describe ${{ env.RUN_SERVICE_NAME }} --region=${{ env.GCP_REGION }} --format="value(status.url)")" >> $GITHUB_ENV
