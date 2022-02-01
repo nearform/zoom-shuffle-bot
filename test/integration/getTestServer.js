@@ -10,7 +10,7 @@ export default function getTestServer() {
     redirectUri: process.env.REDIRECT_URL,
     dbUser: process.env.DB_USER,
     dbPassword: process.env.DB_PASSWORD,
-    dbPort: process.env.DB_PORT || 5432,
+    dbPort: process.env.DB_PORT,
     dbHost: process.env.DB_HOST,
     dbName: process.env.DB_NAME,
   })

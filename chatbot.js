@@ -9,7 +9,7 @@ const server = buildServer({
   dbPassword: process.env.DB_PASSWORD,
   dbHost: process.env.DB_HOST,
   dbName: process.env.DB_NAME,
-  dbPort: process.env.DB_PORT || 5432,
+  dbPort: process.env.DB_PORT,
   clientId: process.env.CLIENT_ID,
   clientSecret: process.env.CLIENT_SECRET,
   botJid: process.env.BOT_JID,

@@ -7,7 +7,7 @@ export default function buildServer(config = { logger: true }) {
     user: config.dbUser,
     password: config.dbPassword,
     host: config.dbHost,
-    port: config.dbPort,
+    port: config.dbPort || 5432,
     database: config.dbName,
     ssl: false,
   })
