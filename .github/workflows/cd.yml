@@ -6,7 +6,7 @@ on:
 
   workflow_dispatch:
     inputs:
-      service_name:
+      run_service_name:
         description: 'Cloud Run service name'
         required: true
         default: 'zoom-shuffle-bot-test'
@@ -30,9 +30,9 @@ jobs:
       SQL_INSTANCE_NAME: production-postgres
       SQL_INSTANCE_CPU: 2
       SQL_INSTANCE_MEM: 4GB
-      SQL_DATABASE_NAME: zoom-shuffle-bot
+      SQL_DATABASE_NAME: ${{ github.event.inputs.sql_database_name || 'zoom-shuffle-bot' }}
       SQL_ROOT_USERNAME: postgres
-      RUN_SERVICE_NAME: zoom-shuffle-bot
+      RUN_SERVICE_NAME: ${{ github.event.inputs.run_service_name || 'zoom-shuffle-bot' }}
       RUN_CPU: 1
       RUN_MEM: 2G
       # secrets:
@@ -73,7 +73,7 @@ jobs:
 
       - name: 'Check if Cloud SQL Database exists'
         run: >-
-          gcloud sql databases describe ${{ INPUT_SQL_DATABASE_NAME || env.SQL_DATABASE_NAME }}
+          gcloud sql databases describe ${{ env.SQL_DATABASE_NAME }}
           --instance=${{ env.SQL_INSTANCE_NAME }} 
           --format="value(name)"  
           >/dev/null 2>/dev/null
@@ -82,7 +82,7 @@ jobs:
       - name: 'Provision Cloud SQL Database'
         if: env.PROVISION_SQL_DATABASE == 'true'
         run: >-
-          gcloud sql databases create ${{ INPUT_SQL_DATABASE_NAME || env.SQL_DATABASE_NAME }}
+          gcloud sql databases create ${{ env.SQL_DATABASE_NAME }}
           --instance=${{ env.SQL_INSTANCE_NAME }}
 
       - name: 'Authorize Docker push'
@@ -94,7 +94,7 @@ jobs:
       - name: 'Deploy to Cloud Run'
         id: deploy
         run: >-
-          gcloud run deploy ${{ INPUT_RUN_SERVICE_NAME || env.RUN_SERVICE_NAME }}
+          gcloud run deploy ${{ env.RUN_SERVICE_NAME }}
           --region=${{ env.GCP_REGION }}
           --cpu=${{ env.RUN_CPU }}
           --memory=${{ env.RUN_MEM }}
@@ -106,7 +106,7 @@ jobs:
           DB_USER=${{ env.SQL_ROOT_USERNAME }},
           DB_PASSWORD=${{ secrets.SQL_ROOT_PASSWORD }},
           DB_HOST=${{ env.SQL_HOST }},
-          DB_NAME=${{ INPUT_SQL_DATABASE_NAME || env.SQL_DATABASE_NAME }},
+          DB_NAME=${{ env.SQL_DATABASE_NAME }},
           CLIENT_ID=${{ secrets.ZOOM_CLIENT_ID }},
           CLIENT_SECRET=${{ secrets.ZOOM_CLIENT_SECRET }},
           BOT_JID=${{ secrets.ZOOM_BOT_JID }},
@@ -114,11 +114,11 @@ jobs:
           VERIFICATION_TOKEN=${{ secrets.ZOOM_VERIFICATION_TOKEN }}'
 
       - name: 'Retrieve the Cloud Run service url'
-        run: echo "RUN_URL=$(gcloud run services describe ${{ INPUT_RUN_SERVICE_NAME || env.RUN_SERVICE_NAME }} --region=${{ env.GCP_REGION }} --format="value(status.url)")" >> $GITHUB_ENV
+        run: echo "RUN_URL=$(gcloud run services describe ${{ env.RUN_SERVICE_NAME }} --region=${{ env.GCP_REGION }} --format="value(status.url)")" >> $GITHUB_ENV
 
       - name: 'Make the service public'
         run: >-
-          gcloud run services add-iam-policy-binding ${{ INPUT_RUN_SERVICE_NAME || env.RUN_SERVICE_NAME }}
+          gcloud run services add-iam-policy-binding ${{ env.RUN_SERVICE_NAME }}
           --member="allUsers"
           --role="roles/run.invoker"
           --region=${{ env.GCP_REGION }}
