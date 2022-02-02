@@ -13,20 +13,25 @@ jobs:
       contents: 'read'
       id-token: write
 
-    steps:
-      - name: 'Set environment variables'
-        run: |
-          echo "GCP_PROJECT_ID=shuffle-zoom-bot" >> $GITHUB_ENV
-          echo "GCP_REGION=europe-west1" >> $GITHUB_ENV
-          echo "SQL_INSTANCE_NAME=production-postgres" >> $GITHUB_ENV
-          echo "SQL_INSTANCE_CPU=2" >> $GITHUB_ENV
-          echo "SQL_INSTANCE_MEM=4GB" >> $GITHUB_ENV
-          echo "SQL_DATABASE_NAME=zoom-shuffle-bot" >> $GITHUB_ENV
-          echo "SQL_ROOT_USERNAME=postgres" >> $GITHUB_ENV
-          echo "RUN_SERVICE_NAME=zoom-shuffle-bot" >> $GITHUB_ENV
-          echo "RUN_CPU=1" >> $GITHUB_ENV
-          echo "RUN_MEM=2G" >> $GITHUB_ENV
+    env:
+      GCP_PROJECT_ID: shuffle-zoom-bot
+      GCP_REGION: europe-west1
+      SQL_INSTANCE_NAME: production-postgres
+      SQL_INSTANCE_CPU: 2
+      SQL_INSTANCE_MEM: 4GB
+      SQL_DATABASE_NAME: zoom-shuffle-bot
+      SQL_ROOT_USERNAME: postgres
+      RUN_SERVICE_NAME: zoom-shuffle-bot
+      RUN_CPU: 1
+      RUN_MEM: 2G
+      # secrets:
+      #   GCP_WORKLOAD_IDENTITY_PROVIDER, GCP_SERVICE_ACCOUNT,
+      #   SQL_ROOT_PASSWORD,
+      #   ZOOM_CLIENT_ID, ZOOM_CLIENT_SECRET, ZOOM_BOT_JID, ZOOM_REDIRECT_URL, ZOOM_VERIFICATION_TOKEN
+      # set in the workflow:
+      #   PROVISION_SQL_INSTANCE, PROVISION_SQL_DATABASE, SQL_HOST, RUN_URL
 
+    steps:
       - uses: actions/checkout@v2
 
       - name: 'Authenticate with GCP'
