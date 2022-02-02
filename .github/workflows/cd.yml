@@ -9,11 +9,11 @@ on:
       run_service_name:
         description: 'Cloud Run service name'
         required: true
-        default: 'zoom-shuffle-bot-test'
+        default: 'shuffle-bot-test'
       sql_database_name:
         description: 'Cloud SQL database name'
         required: true
-        default: 'zoom-shuffle-bot-test'
+        default: 'shuffle-bot-test'
 
 jobs:
   provision:
@@ -30,9 +30,9 @@ jobs:
       SQL_INSTANCE_NAME: production-postgres
       SQL_INSTANCE_CPU: 2
       SQL_INSTANCE_MEM: 4GB
-      SQL_DATABASE_NAME: ${{ github.event.inputs.sql_database_name || 'zoom-shuffle-bot' }}
+      SQL_DATABASE_NAME: ${{ github.event.inputs.sql_database_name || 'shuffle-bot' }}
       SQL_ROOT_USERNAME: postgres
-      RUN_SERVICE_NAME: ${{ github.event.inputs.run_service_name || 'zoom-shuffle-bot' }}
+      RUN_SERVICE_NAME: ${{ github.event.inputs.run_service_name || 'shuffle-bot' }}
       RUN_CPU: 1
       RUN_MEM: 2G
       # secrets:
