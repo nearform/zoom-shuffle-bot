@@ -4,7 +4,7 @@ CREATE TABLE tokens(
     access_token TEXT NOT NULL,
     refresh_token TEXT,
     expires_on NUMERIC NOT NULL,
-    CONSTRAINT unique_tokens UNIQUE (account_id, token_type)
+    PRIMARY KEY (account_id, token_type)
 );
 
 CREATE TABLE meetings(
