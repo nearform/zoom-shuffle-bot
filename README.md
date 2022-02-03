@@ -55,7 +55,13 @@ Logs can be easily narrowed down to a specific commit deployment by filtering on
 2. `npm run db:up` - to start up the database docker container
 3. `npm run db:migrate` - to initialize the database tables
 4. `npm run dev` - to start up the local server with nodemon (node debugger is available on the default port 9229)
-5. `ngrok http 3000` - to expose your local app running on port 3000 (keep note of your public ngrok https url) 
+5. `ngrok http 3000` - to expose your local app running on port 3000
+
+Keep note of your public ngrok https url - we'll refer to it as `$PUBLIC_URL` in the following steps:
+![Zrzut ekranu 2022-02-3 o 17 04 51](https://user-images.githubusercontent.com/5416572/152380581-d9bd7eba-81d3-454a-80eb-d33354daa8d2.png)
+
+NOTE: If you're using ngrok to expose your local app make sure to create an account and log in before proceeding with 
+the following steps.
 
 ### Setting up a Zoom Chatbot for development
 
@@ -64,20 +70,22 @@ Logs can be easily narrowed down to a specific commit deployment by filtering on
    reference)
 2. In the `App credentials` tab:
    - copy the development `Client ID` and `Client secret` to your local `.env` file
-   - fill in the `Redirect URL for OAuth` field - this is the `/authorize` endpoint - 
+   - fill in the `Redirect URL for OAuth` field - this is the `$PUBLIC_URL/authorize` endpoint - 
      in you `.env` file set `REDIRECT_URL` to the same value
-   - add your public app url to the `OAuth allow list` - this is necessary for oauth to work
+   - add the `$PUBLIC_URL` to the `OAuth allow list` - this is necessary for oauth to work
+   ![Zrzut ekranu 2022-02-3 o 17 10 46](https://user-images.githubusercontent.com/5416572/152381611-ff55fbc4-79b4-426d-a227-8ebb79002461.png)
 3. In the `Information` tab fill in the `Developer Contact Information` section
 4. In the `Feature` tab:
-   - fill in the `Bot endpoint URL` field - this is the `/bot` endpoint
+   - fill in the `Bot endpoint URL` field - this is the `$PUBLIC_URL/bot` endpoint
    - optionally add a slash command (note: this has to be a value that is unique for the entire Zoom Marketplace)
    - enable `Events subscription` fo all users in the account and subscribe to the following events:
      - End Meeting
      - Participant/Host joined meeting
      - Participant/Host left meeting
-   - fill in the `Event notification endpoint URL` - this is the `/hook` endpoint
+   - fill in the `Event notification endpoint URL` - this is the `$PUBLIC_URL/hook` endpoint
    - copy the `Verification Token` to your local `.env` file
    - copy the `Bot JID` to your local `.env` file (it will be generated when settings are saved)
+   ![Zrzut ekranu 2022-02-3 o 17 12 53](https://user-images.githubusercontent.com/5416572/152381946-e7cbc48b-849e-4b44-b698-05a5020ad85e.png)
 5. In the `Scopes` tab add the `user:read:admin` scope - here's a reference description of the used scopes:
    ![Zrzut ekranu 2022-02-2 o 13 25 32](https://user-images.githubusercontent.com/5416572/152153304-6fa14420-0ef5-49c3-9788-9e1de702516e.png)
 6. Move on to the `Local test` tab and try installing the app locally (make sure that your app is running, publicly 
