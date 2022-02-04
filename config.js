@@ -5,7 +5,7 @@ import S from 'fluent-json-schema'
 const schema = S.object()
   .prop('NODE_ENV', S.string().default('development'))
   .prop('LOG_LEVEL', S.string().default('info'))
-  .prop('PRETTY_PRINT', S.string().default(false))
+  .prop('PRETTY_PRINT', S.boolean().default(false))
   .prop('CLIENT_ID', S.string().required())
   .prop('CLIENT_SECRET', S.string().required())
   .prop('BOT_JID', S.string().required())
