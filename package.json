@@ -34,7 +34,7 @@
     "http-errors": "^2.0.0",
     "node-fetch": "^3.2.1",
     "pg": "^8.7.3",
-    "pino-pretty": "^7.5.2",
+    "pino-pretty": "^7.5.3",
     "postgrator-cli": "^4.0.0"
   },
   "devDependencies": {
