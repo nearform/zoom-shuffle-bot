@@ -105,3 +105,10 @@ Another little problem comes when the app is locally tested using Linux.
 Authorizing the device redirect you to an unsupported page, and the bot is not added to your account.
 In this case, try using windows or mac.
 
+### Webhooks issue:
+If the bot stop working and always respond "Sorry, you don't seem to be participating in any of the ongoing meetings", it can depend on a problem with the webhooks, in
+fact, the tracking of the join and left of the meeting is tracked using the webhooks.
+
+For the local testing is enough to re-authorize the bot by clicking on the Add button in the Local test tab and trying again.
+
+For the production environment, you can try to open the `publishable url` in a browser. The publishable url is available in the submit tab of the app configuration.
