@@ -92,3 +92,27 @@ the following steps.
    available and using the development secrets). You will be asked to authorize the app and if everything goes well 
    you will be redirected to a new Zoom chat with your bot. You can re-install the app locally as many times as you need.
 7. You can test the app by sending any message directly to the bot, or by using the slash command if you've set one up.
+
+## Troubleshooting
+
+During the setup and installation phase you can come across a few problems:
+
+### Gmail issue
+Since February 2022 are occurring some problems creating the bot using an account registered with the @gmail.com domain. The returned error is a generic `fail_register_robot_to_robot_service`. Using an account made using a non-Gmail account everything works well. https://devforum.zoom.us/t/getting-fail-register-robot-to-robot-service-error-while-saving-bot-url-in-features/64742
+
+### Linux issue
+Another little problem comes when the app is locally tested using Linux. 
+Authorizing the device redirects you to an unsupported page, and the bot is not added to your account.
+In this case, try using windows or mac.
+
+### Webhooks issue
+If the bot stops working and always responds with "Sorry, you don't seem to be participating in any of the ongoing meetings", it can depend on a problem with the webhooks, in
+fact, the tracking of the join and left of the meeting is tracked using the webhooks.
+
+For local testing it is enough to re-authorize the bot by clicking on the Add button in the Local test tab and trying again.
+
+![Bot_screenshot_20220308_160418](https://user-images.githubusercontent.com/1851362/157255589-1894ceda-c89d-4a14-badf-45f8b5524b18.png)
+
+For the production environment, you can try to open the `publishable url` in a browser. The publishable url is available in the submit tab of the app configuration.
+
+![Bot_screenshot_20220308_160419](https://user-images.githubusercontent.com/1851362/157255632-1f263236-7f0b-4b55-9e56-231132f3764d.png)
