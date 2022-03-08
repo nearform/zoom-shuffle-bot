@@ -111,4 +111,8 @@ fact, the tracking of the join and left of the meeting is tracked using the webh
 
 For the local testing is enough to re-authorize the bot by clicking on the Add button in the Local test tab and trying again.
 
+![Bot_screenshot_20220308_160418](https://user-images.githubusercontent.com/1851362/157255589-1894ceda-c89d-4a14-badf-45f8b5524b18.png)
+
 For the production environment, you can try to open the `publishable url` in a browser. The publishable url is available in the submit tab of the app configuration.
+
+![Bot_screenshot_20220308_160419](https://user-images.githubusercontent.com/1851362/157255632-1f263236-7f0b-4b55-9e56-231132f3764d.png)
