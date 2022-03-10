@@ -19,7 +19,7 @@ The server has three public endpoints:
 - `/bot` - used for handling Chatbot calls (when a slash command is used or a direct message is sent to the bot), and
   responds with the randomized list of participants
 
-Meeting participants might not necessarily be logged in, that's why the app is storing both the usernames (which maybe
+Meeting participants might not necessarily be logged in, that's why the app is storing both the usernames (which may be
 set for the current meeting only) and user ids of the logged-in users for looking up their active meetings.
 
 To avoid privacy issues usernames stored in the database are encrypted using SHA256.
