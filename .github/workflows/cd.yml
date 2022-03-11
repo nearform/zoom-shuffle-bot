@@ -35,13 +35,6 @@ jobs:
       RUN_SERVICE_NAME: ${{ github.event.inputs.run_service_name || 'shuffle-bot' }}
       RUN_CPU: 1
       RUN_MEM: 2G
-      # secrets:
-      #   GCP_WORKLOAD_IDENTITY_PROVIDER, GCP_SERVICE_ACCOUNT,
-      #   SQL_ROOT_PASSWORD,
-      #   ZOOM_CLIENT_ID, ZOOM_CLIENT_SECRET, ZOOM_BOT_JID, ZOOM_REDIRECT_URL, ZOOM_VERIFICATION_TOKEN
-      # set in the workflow:
-      #   PROVISION_SQL_INSTANCE, PROVISION_SQL_DATABASE, SQL_HOST, RUN_URL
-
     steps:
       - uses: actions/checkout@v3
 
