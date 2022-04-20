@@ -1,6 +1,7 @@
 import { getUserActiveMeeting } from '../services/db.js'
 import { decrypt } from '../helpers/crypto.js'
 import { USAGE_HINTS } from '../const.js'
+import sortRandomly from '../helpers/sortRandomly.js'
 
 export default async function (fastify) {
   fastify.post(
@@ -48,11 +49,11 @@ export default async function (fastify) {
             participant => participant !== userName
           )
 
-          if (participants.length === 0) {
+          if (updatedParticipants.length === 0) {
             await sendMessage(
               {
                 head: {
-                  text: `You're currently in *${topic}*.\nThere are no other participants at the moment.`,
+                  text: `You're currently in *${topic}*.\nSorry, there are no other participants at the moment.`,
                 },
               },
               true
@@ -64,17 +65,15 @@ export default async function (fastify) {
           updatedParticipants = participants
         }
 
+        const randomParticipants = sortRandomly(updatedParticipants)
+
         await sendMessage(
           {
             head: {
-              text: `You're currently in *${topic}*.\nHere's a random list of its ${meeting.participants.length} participants:`,
+              text: `You're currently in *${topic}*.\nHere's a random list of its ${updatedParticipants.length} participants:`,
             },
           },
           true
-        )
-
-        const randomParticipants = updatedParticipants.sort(
-          () => Math.random() - 0.5
         )
 
         await sendMessage({
