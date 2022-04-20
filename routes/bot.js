@@ -49,11 +49,14 @@ export default async function (fastify) {
           )
 
           if (participants.length === 0) {
-            await sendMessage({
-              head: {
-                text: `You're currently in *${topic}*.\nThere are no other participants at the moment.`,
+            await sendMessage(
+              {
+                head: {
+                  text: `You're currently in *${topic}*.\nThere are no other participants at the moment.`,
+                },
               },
-            })
+              true
+            )
             res.code(200).send()
             return
           }
