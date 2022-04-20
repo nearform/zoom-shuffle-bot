@@ -26,7 +26,6 @@ describe('/bot route', () => {
   })
 
   beforeEach(() => {
-    jest.setTimeout(10e4)
     jest.resetAllMocks()
   })
 
