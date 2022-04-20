@@ -105,7 +105,7 @@ To avoid privacy issues usernames stored in the database are encrypted using SHA
    available and using the development secrets). You will be asked to authorize the app and if everything goes well
    you will be redirected to a new Zoom chat with your bot. You can re-install the app locally as many times as you need.
    ![Local test tab](https://user-images.githubusercontent.com/1851362/157255589-1894ceda-c89d-4a14-badf-45f8b5524b18.png)
-7. You can test the app by:
+7. You can test the Chatbot in Zoom by:
    1. sending any message directly to the bot (anything you send here will trigger the bot, you can also type `skipme`)
    2. sending messages to a new/existing channel (`/SLASH_COMMAND_FROM_STEP_4` or `/SLASH_COMMAND_FROM_STEP_4 skipme`)
 8. For development purposes, don't submit the app in the `Submit` tab. Keep it as a draft.
