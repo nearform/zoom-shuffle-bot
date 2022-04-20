@@ -45,17 +45,21 @@ To avoid privacy issues usernames stored in the database are encrypted using SHA
 
    `npm run db:up`
 
-3. **Run the database migrations to initialize the database tables**
+3. **Install packages**
+
+   `npm install`
+
+4. **Run the database migrations to initialize the database tables**
 
    `npm run db:migrate`
 
-4. **Startup the local server with nodemon**
+5. **Startup the local server with nodemon**
 
    `npm run dev`
 
    _node debugger is available on the default port 9229_
 
-5. **Use ngrok to expose the local app**
+6. **Use ngrok to expose the local app**
 
    If you don't have ngrok installed, here you can find the setup instructions: [Ngrok install](https://ngrok.com/download)
    
@@ -64,7 +68,7 @@ To avoid privacy issues usernames stored in the database are encrypted using SHA
 
    `ngrok http 3000` - run this command to expose your local app running on port 3000
 
-6. **Keep note of your public ngrok https url** 
+7. **Keep note of your public ngrok https url** 
    
    we'll refer to it as `$PUBLIC_URL` in the following steps
    ![Ngrok](https://user-images.githubusercontent.com/5416572/152380581-d9bd7eba-81d3-454a-80eb-d33354daa8d2.png)
@@ -85,7 +89,8 @@ To avoid privacy issues usernames stored in the database are encrypted using SHA
 3. In the `Information` tab fill in the `Developer Contact Information` section
 4. In the `Feature` tab:
    - fill in the `Bot endpoint URL` field - this is the `$PUBLIC_URL/bot` endpoint
-   - optionally add a slash command (note: this has to be a value that is unique for the entire Zoom Marketplace)
+   - add a slash command (note: this has to be a value that is unique for the entire Zoom Marketplace)
+     - add a "usage hint" named "skipme" and add its description: "Do not include me in the random list of participants"
    - enable `Events subscription` for all users in the account and subscribe to the following events:
      - End Meeting
      - Participant/Host joined meeting
@@ -100,7 +105,10 @@ To avoid privacy issues usernames stored in the database are encrypted using SHA
    available and using the development secrets). You will be asked to authorize the app and if everything goes well
    you will be redirected to a new Zoom chat with your bot. You can re-install the app locally as many times as you need.
    ![Local test tab](https://user-images.githubusercontent.com/1851362/157255589-1894ceda-c89d-4a14-badf-45f8b5524b18.png)
-7. You can test the app by sending any message directly to the bot, or by using the slash command if you've set one up.
+7. You can test the app by:
+   1. sending any message directly to the bot (anything you send here will trigger the bot, you can also type `skipme`)
+   2. sending messages to a new/existing channel (`/SLASH_COMMAND_FROM_STEP_4` or `/SLASH_COMMAND_FROM_STEP_4 skipme`)
+8. For development purposes, don't submit the app in the `Submit` tab. Keep it as a draft.
 
 ## Continuous integration
 GitHub Actions are used for running tests in a controlled environment
