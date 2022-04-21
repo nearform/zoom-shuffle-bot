@@ -1,4 +1,5 @@
 export default {
+  collectCoverage: true,
   setupFiles: ['./.jest/env.js', './.jest/mocks.js'],
   clearMocks: true,
   transform: {
