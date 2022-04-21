@@ -157,7 +157,7 @@ describe('/bot route', () => {
 
     expect(response.statusCode).toBe(200)
     expect(db.getUserActiveMeeting).toBeCalledWith(mockPg, '1239999')
-    expect(mockSendBotMessage).toHaveBeenNthCalledWith(1, {
+    expect(mockSendBotMessage).toHaveBeenCalledWith({
       accountId: '999999999',
       content: {
         head: {
@@ -188,7 +188,7 @@ describe('/bot route', () => {
 
     expect(response.statusCode).toBe(200)
     expect(db.getUserActiveMeeting).toBeCalledWith(mockPg, '1239999')
-    expect(mockSendBotMessage).toHaveBeenNthCalledWith(1, {
+    expect(mockSendBotMessage).toHaveBeenCalledWith({
       accountId: '999999999',
       content: {
         head: {
@@ -198,5 +198,24 @@ describe('/bot route', () => {
       toJid: '123abcd',
       isMarkdown: undefined,
     })
+  })
+
+  it('returns status 500 when error occurred during handling the request', async () => {
+    db.getUserActiveMeeting.mockImplementation(() => new Error())
+    const response = await server.inject({
+      method: 'POST',
+      url: '/bot',
+      body: {
+        payload: {
+          toJid: '123abcd',
+          cmd: '',
+          accountId: '999999999',
+          userId: '1239999',
+          userName: 'Andrej Staš',
+        },
+      },
+    })
+
+    expect(response.statusCode).toBe(500)
   })
 })

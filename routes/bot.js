@@ -1,6 +1,6 @@
 import { getUserActiveMeeting } from '../services/db.js'
 import { decrypt } from '../helpers/crypto.js'
-import { USAGE_HINTS } from '../const.js'
+import { SUBCOMMANDS } from '../const.js'
 import sortRandomly from '../helpers/sortRandomly.js'
 
 export default async function (fastify) {
@@ -44,7 +44,7 @@ export default async function (fastify) {
         )
         let updatedParticipants
 
-        if (cmd === USAGE_HINTS.SKIP_ME) {
+        if (cmd === SUBCOMMANDS.SKIP_ME) {
           updatedParticipants = participants.filter(
             participant => participant !== userName
           )
