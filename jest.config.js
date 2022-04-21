@@ -4,4 +4,10 @@ export default {
   transform: {
     '^.+\\.js$': 'babel-jest',
   },
+  coverageThreshold: {
+    global: {
+      branches: 58,
+      functions: 63,
+    },
+  },
 }
