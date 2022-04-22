@@ -1,0 +1,15 @@
+{
+  "ignore": [
+    "*.test.js"
+  ],
+  "watch": [
+    ".env",
+    "./helpers/**",
+    "./plugins/**",
+    "./routes/**",
+    "./services/**"
+  ],
+  "execArgs": [
+    "--inspect"
+  ]
+}
