@@ -4,10 +4,10 @@
   ],
   "watch": [
     ".env",
-    "./helpers/**",
-    "./plugins/**",
-    "./routes/**",
-    "./services/**"
+    "./helpers",
+    "./plugins",
+    "./routes",
+    "./services"
   ],
   "execArgs": [
     "--inspect"
