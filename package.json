@@ -9,7 +9,7 @@
     "test:unit": "jest --testPathIgnorePatterns=test/integration",
     "test:integration": "jest --testPathPattern=test/integration --runInBand",
     "start": "npm run db:migrate && node chatbot.js",
-    "dev": "nodemon --inspect chatbot.js",
+    "dev": "nodemon chatbot.js",
     "lint": "eslint .",
     "lint:fix": "eslint --fix .",
     "db:up": "docker-compose up -d",
