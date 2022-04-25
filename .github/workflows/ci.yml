@@ -28,8 +28,6 @@ jobs:
           node-version: 16
       - run: |
           npm ci
-          npm run db:migrate
-          npm run db:populate
           npm test
 
   automerge:
