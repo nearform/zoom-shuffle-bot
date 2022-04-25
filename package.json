@@ -7,7 +7,7 @@
   "scripts": {
     "test": "npm run test:unit && npm run test:integration",
     "test:unit": "jest --testPathIgnorePatterns=test/integration",
-    "test:integration": "npm run db:in-tests:up && sleep 1 && npm run db:in-tests:migrate && jest --testPathPattern=test/integration --runInBand && npm run db:in-tests:down",
+    "test:integration": "npm run db:in-tests:up && sleep 1 && jest --testPathPattern=test/integration --runInBand && npm run db:in-tests:down",
     "start": "npm run db:migrate && node chatbot.js",
     "dev": "nodemon chatbot.js",
     "lint": "eslint .",
