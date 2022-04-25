@@ -4,6 +4,10 @@
   ],
   "watch": [
     ".env",
+    "./chatbot.js",
+    "./config.js",
+    "./const.js",
+    "./server.js",
     "./helpers",
     "./plugins",
     "./routes",
