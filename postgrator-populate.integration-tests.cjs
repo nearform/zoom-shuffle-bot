@@ -1,4 +1,4 @@
-const defaultConfig = require('./postgrator.cjs')
+const defaultConfig = require('./postgrator.integration-tests.cjs')
 
 module.exports = {
   ...defaultConfig,

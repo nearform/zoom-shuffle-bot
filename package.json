@@ -1,5 +1,5 @@
 {
-  "name": "zoom-talking-stick",
+  "name": "zoom-shuffle-bot",
   "version": "1.0.0",
   "description": "",
   "main": "chatbot.js",
@@ -7,7 +7,7 @@
   "scripts": {
     "test": "npm run test:unit && npm run test:integration",
     "test:unit": "jest --testPathIgnorePatterns=test/integration",
-    "test:integration": "jest --testPathPattern=test/integration --runInBand",
+    "test:integration": "npm run db:in-tests:up && sleep 1 && npm run db:in-tests:migrate && jest --testPathPattern=test/integration --runInBand && npm run db:in-tests:down",
     "start": "npm run db:migrate && node chatbot.js",
     "dev": "nodemon chatbot.js",
     "lint": "eslint .",
@@ -15,11 +15,15 @@
     "db:up": "docker-compose up -d",
     "db:migrate": "postgrator --config=./postgrator.cjs",
     "db:migrate:rollback": "postgrator 0 --config=./postgrator.cjs",
-    "db:reset": "npm run db:populate:rollback && npm run db:migrate:rollback && npm run db:migrate && npm run db:populate",
-    "db:populate": "postgrator --config=./postgrator-populate.cjs",
-    "db:populate:rollback": "postgrator 0 --config=./postgrator-populate.cjs",
     "db:down": "docker-compose down",
-    "db:connect": "docker-compose exec postgres psql -U postgres -d postgres"
+    "db:connect": "docker-compose exec postgres psql -U postgres -d postgres",
+    "db:in-tests:up": "docker-compose -f ./docker-compose.integration-tests.yml up -d",
+    "db:in-tests:migrate": "postgrator --config=./postgrator.integration-tests.cjs",
+    "db:in-tests:migrate:rollback": "postgrator 0 --config=./postgrator.integration-tests.cjs",
+    "db:in-tests:populate": "postgrator --config=./postgrator-populate.integration-tests.cjs",
+    "db:in-tests:populate:rollback": "postgrator 0 --config=./postgrator-populate.integration-tests.cjs",
+    "db:in-tests:reset": "npm run db:in-tests:populate:rollback && npm run db:in-tests:migrate:rollback && npm run db:in-tests:migrate && npm run db:in-tests:populate",
+    "db:in-tests:down": "docker stop integration-tests"
   },
   "author": "",
   "license": "ISC",
