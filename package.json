@@ -33,7 +33,7 @@
     "fastify-postgres": "^3.7.0",
     "fluent-json-schema": "^3.1.0",
     "http-errors": "^2.0.0",
-    "node-fetch": "^3.2.9",
+    "node-fetch": "^3.2.10",
     "pg": "^8.7.3",
     "pino-pretty": "^8.1.0",
     "postgrator-cli": "^6.0.0"
