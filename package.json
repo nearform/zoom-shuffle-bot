@@ -34,7 +34,7 @@
     "fluent-json-schema": "^3.1.0",
     "http-errors": "^2.0.0",
     "node-fetch": "^3.2.10",
-    "pg": "^8.7.3",
+    "pg": "^8.8.0",
     "pino-pretty": "^9.0.1",
     "postgrator-cli": "^6.0.0"
   },
