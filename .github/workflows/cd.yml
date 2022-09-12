@@ -96,7 +96,6 @@ jobs:
           --source=.
           --set-env-vars='
           NODE_ENV=production,
-          PORT=3000,
           DB_USER=${{ env.SQL_ROOT_USERNAME }},
           DB_PASSWORD=${{ secrets.SQL_ROOT_PASSWORD }},
           DB_HOST=${{ env.SQL_HOST }},
