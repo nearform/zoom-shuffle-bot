@@ -39,7 +39,7 @@
     "postgrator-cli": "^6.0.0"
   },
   "devDependencies": {
-    "@babel/core": "^7.19.6",
+    "@babel/core": "^7.20.2",
     "@babel/preset-env": "^7.19.4",
     "@jest/globals": "^29.2.1",
     "babel-jest": "^29.2.2",
