@@ -28,7 +28,7 @@
     "dotenv": "^16.0.3",
     "env-schema": "^5.1.1",
     "fast-json-stringify": "^5.4.1",
-    "fastify": "^4.9.2",
+    "fastify": "^4.10.0",
     "fastify-plugin": "^4.3.0",
     "fastify-postgres": "^3.7.0",
     "fluent-json-schema": "^4.0.0",
