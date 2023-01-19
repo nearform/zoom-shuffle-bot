@@ -73,5 +73,5 @@ async function plugin(fastify, options = {}) {
 
 export default fp(plugin, {
   name: 'fastify-zoom',
-  dependencies: ['fastify-postgres'],
+  dependencies: ['@fastify/postgres'],
 })

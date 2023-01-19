@@ -4,11 +4,15 @@ export default function buildServer(config) {
   const fastify = Fastify({
     logger: {
       level: config.LOG_LEVEL,
-      prettyPrint: config.PRETTY_PRINT,
+      ...(config.PRETTY_PRINT && {
+        transport: {
+          target: 'pino-pretty',
+        },
+      }),
     },
   })
 
-  fastify.register(import('fastify-postgres'), {
+  fastify.register(import('@fastify/postgres'), {
     user: config.DB_USER,
     password: config.DB_PASSWORD,
     host: config.DB_HOST,
