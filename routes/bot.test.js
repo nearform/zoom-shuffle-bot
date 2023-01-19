@@ -56,7 +56,7 @@ describe('/bot route', () => {
     })
 
     expect(response.statusCode).toBe(200)
-    expect(db.getUserActiveMeeting).toBeCalledWith(mockPg, '1239999')
+    expect(db.getUserActiveMeeting).toHaveBeenCalledWith(mockPg, '1239999')
     expect(mockSendBotMessage).toHaveBeenNthCalledWith(1, {
       accountId: '999999999',
       content: {
@@ -107,7 +107,7 @@ describe('/bot route', () => {
     })
 
     expect(response.statusCode).toBe(200)
-    expect(db.getUserActiveMeeting).toBeCalledWith(mockPg, '1239999')
+    expect(db.getUserActiveMeeting).toHaveBeenCalledWith(mockPg, '1239999')
     expect(mockSendBotMessage).toHaveBeenNthCalledWith(1, {
       accountId: '999999999',
       content: {
@@ -156,7 +156,7 @@ describe('/bot route', () => {
     })
 
     expect(response.statusCode).toBe(200)
-    expect(db.getUserActiveMeeting).toBeCalledWith(mockPg, '1239999')
+    expect(db.getUserActiveMeeting).toHaveBeenCalledWith(mockPg, '1239999')
     expect(mockSendBotMessage).toHaveBeenCalledWith({
       accountId: '999999999',
       content: {
@@ -187,7 +187,7 @@ describe('/bot route', () => {
     })
 
     expect(response.statusCode).toBe(200)
-    expect(db.getUserActiveMeeting).toBeCalledWith(mockPg, '1239999')
+    expect(db.getUserActiveMeeting).toHaveBeenCalledWith(mockPg, '1239999')
     expect(mockSendBotMessage).toHaveBeenCalledWith({
       accountId: '999999999',
       content: {

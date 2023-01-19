@@ -29,9 +29,8 @@ To avoid privacy issues usernames stored in the database are encrypted using SHA
 ### Requirements
 
 - Node LTS
-- npm >=8
 - docker
-- docker-compose
+- docker compose
 
 ### Setting up the local environment
 
@@ -62,27 +61,28 @@ To avoid privacy issues usernames stored in the database are encrypted using SHA
 6. **Use ngrok to expose the local app**
 
    If you don't have ngrok installed, here you can find the setup instructions: [Ngrok install](https://ngrok.com/download)
-   
+
    make sure to create an account and log in before proceeding with
    the following steps.
 
    `ngrok http 3000` - run this command to expose your local app running on port 3000
 
-7. **Keep note of your public ngrok https url** 
-   
+7. **Keep note of your public ngrok https url**
+
    we'll refer to it as `$PUBLIC_URL` in the following steps
    ![Ngrok](https://user-images.githubusercontent.com/5416572/152380581-d9bd7eba-81d3-454a-80eb-d33354daa8d2.png)
+
 ### Setting up a Zoom Chatbot for development
 
 1. Visit [Zoom Marketplace](https://marketplace.zoom.us/develop/create) and create a new Chatbot in a private account
    (follow the instructions below and visit [docs](https://marketplace.zoom.us/docs/guides/build/chatbot-app) for
    reference).
 
-   *Some issues found with accounts created with a gmail.com email, refer to the troubleshooting paragraph.*
+   _Some issues found with accounts created with a gmail.com email, refer to the troubleshooting paragraph._
 
 2. In the `App credentials` tab:
    - copy the development `Client ID` and `Client secret` to your local `.env` file
-   - fill in the `Redirect URL for OAuth` field with `$PUBLIC_URL/authorize` replacing `$PUBLIC_URL` with the ngrok http url 
+   - fill in the `Redirect URL for OAuth` field with `$PUBLIC_URL/authorize` replacing `$PUBLIC_URL` with the ngrok http url
    - in you `.env` file set `REDIRECT_URL` to the same value
    - add the `$PUBLIC_URL` to the `OAuth allow list` - this is necessary for OAuth to work
      ![App configuration](https://user-images.githubusercontent.com/5416572/152381611-ff55fbc4-79b4-426d-a227-8ebb79002461.png)
@@ -111,23 +111,26 @@ To avoid privacy issues usernames stored in the database are encrypted using SHA
 8. For development purposes, don't submit the app in the `Submit` tab. Keep it as a draft.
 
 ## Continuous integration
+
 GitHub Actions are used for running tests in a controlled environment
+
 ## Continuous Delivery
+
 Github Actions deploy the `master` branch to
 Google Cloud Platform.
 
 The Continuous Delivery workflow can be triggered manually in the `Actions` tab (the test database and Run instance have
 to be removed manually).
 
-To make the CD pipeline work, you need to set up the following secrets: 
+To make the CD pipeline work, you need to set up the following secrets:
 
-- `GCP_WORKLOAD_IDENTITY_PROVIDER`, 
-- `GCP_SERVICE_ACCOUNT`, 
-- `SQL_ROOT_PASSWORD`, 
-- `ZOOM_CLIENT_ID`, 
-- `ZOOM_CLIENT_SECRET`, 
-- `ZOOM_BOT_JID`, 
-- `ZOOM_REDIRECT_URL`, 
+- `GCP_WORKLOAD_IDENTITY_PROVIDER`,
+- `GCP_SERVICE_ACCOUNT`,
+- `SQL_ROOT_PASSWORD`,
+- `ZOOM_CLIENT_ID`,
+- `ZOOM_CLIENT_SECRET`,
+- `ZOOM_BOT_JID`,
+- `ZOOM_REDIRECT_URL`,
 - `ZOOM_VERIFICATION_TOKEN`
 
 ## Monitoring and logs
