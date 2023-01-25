@@ -86,7 +86,7 @@ jobs:
           for secret in shuffle-db-host shuffle-db-username shuffle-db-password shuffle-db-name shuffle-client-id shuffle-client-secret shuffle-bot-jid shuffle-redirect-url shuffle-verification-token
           do
             # delete the secret
-            gcloud secrets delete $secret
+            gcloud secrets delete --quiet $secret || true
 
             # re-create the secret
             gcloud secrets create --locations=${{ secrets.GCP_REGION }} --replication-policy=user-managed $secret
