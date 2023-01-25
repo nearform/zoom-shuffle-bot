@@ -89,7 +89,7 @@ jobs:
             gcloud secrets delete $secret || true
 
             # re-create the secret
-            gcloud secrets create --locations=${{ secrets.GCP_REGION }} --replication-policy=user-managed $secret
+            gcloud secrets create --locations=${{ secrets.GCP_REGION }} --replication-policy=user-managed $secret || true
           done
 
           # update the secrets
