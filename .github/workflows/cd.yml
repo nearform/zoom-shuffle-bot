@@ -118,7 +118,7 @@ jobs:
             DB_USER=shuffle-db-username:latest,
             DB_PASSWORD=shuffle-db-password:latest,
             DB_HOST=shuffle-db-host:latest,
-            DB_NAME=shuffle-db-username:latest,
+            DB_NAME=shuffle-db-name:latest,
             CLIENT_ID=shuffle-client-id:latest,
             CLIENT_SECRET=shuffle-client-secret:latest,
             BOT_JID=shuffle-bot-jid:latest,
