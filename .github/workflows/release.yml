@@ -20,3 +20,5 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: nearform/optic-release-automation@v4
+        with:
+          semver: ${{ github.event.inputs.semver }}
