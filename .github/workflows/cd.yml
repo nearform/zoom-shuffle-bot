@@ -93,15 +93,15 @@ jobs:
           done
 
           # update the secrets
-          echo "${{ env.SQL_HOST }}" | gcloud secrets versions add shuffle-db-host --data-file=-
-          echo "${{ secrets.SQL_ROOT_USERNAME }}" | gcloud secrets versions add shuffle-db-username --data-file=-
-          echo "${{ secrets.SQL_ROOT_PASSWORD }}" | gcloud secrets versions add shuffle-db-password --data-file=-
-          echo "${{ secrets.SQL_DATABASE_NAME }}" | gcloud secrets versions add shuffle-db-name --data-file=-
-          echo "${{ secrets.ZOOM_CLIENT_ID }}" | gcloud secrets versions add shuffle-client-id --data-file=-
-          echo "${{ secrets.ZOOM_CLIENT_SECRET }}" | gcloud secrets versions add shuffle-client-secret --data-file=-
-          echo "${{ secrets.ZOOM_BOT_JID }}" | gcloud secrets versions add shuffle-bot-jid --data-file=-
-          echo "${{ secrets.ZOOM_REDIRECT_URL }}" | gcloud secrets versions add shuffle-redirect-url --data-file=-
-          echo "${{ secrets.ZOOM_VERIFICATION_TOKEN }}" | gcloud secrets versions add shuffle-verification-token --data-file=-
+          echo "${{ env.SQL_HOST }}" | tr -d '\n' | gcloud secrets versions add shuffle-db-host --data-file=-
+          echo "${{ secrets.SQL_ROOT_USERNAME }}" | tr -d '\n' | gcloud secrets versions add shuffle-db-username --data-file=-
+          echo "${{ secrets.SQL_ROOT_PASSWORD }}" | tr -d '\n' | gcloud secrets versions add shuffle-db-password --data-file=-
+          echo "${{ secrets.SQL_DATABASE_NAME }}" | tr -d '\n' | gcloud secrets versions add shuffle-db-name --data-file=-
+          echo "${{ secrets.ZOOM_CLIENT_ID }}" | tr -d '\n' | gcloud secrets versions add shuffle-client-id --data-file=-
+          echo "${{ secrets.ZOOM_CLIENT_SECRET }}" | tr -d '\n' | gcloud secrets versions add shuffle-client-secret --data-file=-
+          echo "${{ secrets.ZOOM_BOT_JID }}" | tr -d '\n' | gcloud secrets versions add shuffle-bot-jid --data-file=-
+          echo "${{ secrets.ZOOM_REDIRECT_URL }}" | tr -d '\n' | gcloud secrets versions add shuffle-redirect-url --data-file=-
+          echo "${{ secrets.ZOOM_VERIFICATION_TOKEN }}" | tr -d '\n' | gcloud secrets versions add shuffle-verification-token --data-file=-
 
       - name: 'Deploy to Cloud Run'
         id: deploy
