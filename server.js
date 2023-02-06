@@ -25,7 +25,7 @@ export default function buildServer(config) {
     clientId: config.CLIENT_ID,
     clientSecret: config.CLIENT_SECRET,
     botJid: config.BOT_JID,
-    verificationToken: config.VERIFICATION_TOKEN,
+    secretToken: config.SECRET_TOKEN,
     redirectUri: config.REDIRECT_URL,
   })
 

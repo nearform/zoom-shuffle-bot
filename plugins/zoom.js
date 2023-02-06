@@ -11,7 +11,7 @@ import apiFetch from './apiFetch.js'
 
 async function plugin(fastify, options = {}) {
   validateOptions(
-    ['clientId', 'clientSecret', 'botJid', 'verificationToken', 'redirectUri'],
+    ['clientId', 'clientSecret', 'botJid', 'secretToken', 'redirectUri'],
     options
   )
 

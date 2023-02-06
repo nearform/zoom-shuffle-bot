@@ -30,7 +30,7 @@ async function getBotToken(fastify, options, accountId) {
 export default async function sendBotMessage(
   fastify,
   options,
-  { toJid, accountId, content, isMarkdown }
+  { toJid, userJid, accountId, content, isMarkdown }
 ) {
   const token = await getBotToken(fastify, options, accountId)
 
@@ -41,6 +41,7 @@ export default async function sendBotMessage(
     },
     body: JSON.stringify({
       robot_jid: options.botJid,
+      user_jid: userJid,
       to_jid: toJid,
       account_id: accountId,
       content,

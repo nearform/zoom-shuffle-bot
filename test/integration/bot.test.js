@@ -3,6 +3,7 @@ import resetDatabase from './resetDatabase.js'
 
 import sendBotMessage from '../../plugins/sendBotMessage.js'
 import apiFetch from '../../plugins/apiFetch.js'
+import { createVerificationSignature } from '../../helpers/crypto.js'
 
 jest.mock('../../plugins/sendBotMessage.js')
 jest.mock('../../plugins/apiFetch.js')
@@ -25,16 +26,19 @@ describe('/bot route verification', () => {
   it('responds with 200 when verified', async () => {
     const server = getTestServer()
 
+    const timestamp = 123456789
+    const payload = {
+      payload: {},
+    }
     const response = await server.inject({
       url: '/bot',
       method: 'POST',
       headers: {
-        Authorization: process.env.VERIFICATION_TOKEN,
         clientid: process.env.CLIENT_ID,
+        'x-zm-request-timestamp': timestamp,
+        'x-zm-signature': createVerificationSignature(timestamp, payload),
       },
-      payload: {
-        payload: {},
-      },
+      payload,
     })
 
     expect(response.statusCode).toBe(200)
@@ -51,18 +55,21 @@ describe('/bot route logic', () => {
 
     expect(sendBotMessage).not.toHaveBeenCalled()
 
+    const timestamp = 123456789
+    const payload = {
+      payload: {
+        userId: 'non-existing-id',
+      },
+    }
     const response = await server.inject({
       url: '/bot',
       method: 'POST',
       headers: {
-        Authorization: process.env.VERIFICATION_TOKEN,
         clientid: process.env.CLIENT_ID,
+        'x-zm-request-timestamp': timestamp,
+        'x-zm-signature': createVerificationSignature(timestamp, payload),
       },
-      payload: {
-        payload: {
-          userId: 'non-existing-id',
-        },
-      },
+      payload,
     })
 
     expect(response.statusCode).toBe(200)
@@ -83,19 +90,22 @@ describe('/bot route logic', () => {
 
     apiFetch.mockResolvedValueOnce({ topic: 'Test meeting topic' })
 
+    const timestamp = 123456789
+    const payload = {
+      payload: {
+        accountId: 'test_account_id',
+        userId: 'test_user_id',
+      },
+    }
     const response = await server.inject({
       url: '/bot',
       method: 'POST',
       headers: {
-        Authorization: process.env.VERIFICATION_TOKEN,
         clientid: process.env.CLIENT_ID,
+        'x-zm-request-timestamp': timestamp,
+        'x-zm-signature': createVerificationSignature(timestamp, payload),
       },
-      payload: {
-        payload: {
-          accountId: 'test_account_id',
-          userId: 'test_user_id',
-        },
-      },
+      payload,
     })
 
     expect(response.statusCode).toBe(200)

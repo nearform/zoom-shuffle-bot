@@ -7,7 +7,7 @@ export default function getTestServer() {
     CLIENT_ID: process.env.CLIENT_ID,
     CLIENT_SECRET: process.env.CLIENT_SECRET,
     BOT_JID: process.env.BOT_JID,
-    VERIFICATION_TOKEN: process.env.VERIFICATION_TOKEN,
+    SECRET_TOKEN: process.env.SECRET_TOKEN,
     REDIRECT_URL: process.env.REDIRECT_URL,
     DB_USER: process.env.DB_USER,
     DB_PASSWORD: process.env.DB_PASSWORD,

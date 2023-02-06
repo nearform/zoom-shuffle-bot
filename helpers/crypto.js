@@ -1,4 +1,4 @@
-import { createCipheriv, createDecipheriv } from 'crypto'
+import { createCipheriv, createDecipheriv, createHmac } from 'crypto'
 
 const algorithm = 'aes256'
 const key = `${process.env.CLIENT_ID}.${process.env.CLIENT_SECRET}`
@@ -18,4 +18,16 @@ export function decrypt(value) {
   const decipher = createDecipheriv(algorithm, key, iv)
 
   return decipher.update(value, 'hex', 'utf8') + decipher.final('utf8')
+}
+
+export function createHmacHash(value) {
+  return createHmac('sha256', process.env.SECRET_TOKEN)
+    .update(value)
+    .digest('hex')
+}
+
+export function createVerificationSignature(timestamp, body) {
+  const message = `v0:${timestamp}:${JSON.stringify(body)}`
+  const hashForVerify = createHmacHash(message)
+  return `v0=${hashForVerify}`
 }

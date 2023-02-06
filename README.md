@@ -96,7 +96,7 @@ To avoid privacy issues usernames stored in the database are encrypted using SHA
      - Participant/Host joined meeting
      - Participant/Host left meeting
    - fill in the `Event notification endpoint URL` - this is the `$PUBLIC_URL/hook` endpoint
-   - copy the `Verification Token` to your local `.env` file
+   - copy the `Secret Token` to your local `.env` file
    - copy the `Bot JID` to your local `.env` file (it will be generated when settings are saved)
      ![Feature tab](https://user-images.githubusercontent.com/5416572/152381946-e7cbc48b-849e-4b44-b698-05a5020ad85e.png)
 5. In the `Scopes` tab add the `user:read:admin` scope - here's a reference description of the used scopes:
@@ -140,7 +140,7 @@ To make the CD pipeline work, you need to set up the following secrets:
 - `ZOOM_CLIENT_ID`,
 - `ZOOM_CLIENT_SECRET`,
 - `ZOOM_REDIRECT_URL`,
-- `ZOOM_VERIFICATION_TOKEN`
+- `ZOOM_SECRET_TOKEN`
 
 ## GCP Secret Manager
 
@@ -156,7 +156,7 @@ Also, you need to manually create the following secrets in Secret Manager:
 - `shuffle-client-secret`
 - `shuffle-bot-jid`
 - `shuffle-redirect-url`
-- `shuffle-verification-token`
+- `shuffle-secret-token`
 
 ## Monitoring and logs
 

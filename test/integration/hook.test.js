@@ -5,6 +5,7 @@ import {
   EVENT_PARTICIPANT_LEFT,
 } from '../../const.js'
 import resetDatabase from './resetDatabase.js'
+import { createVerificationSignature } from '../../helpers/crypto.js'
 
 describe('/hook route verification', () => {
   it('responds with 401 when not verified', async () => {
@@ -18,18 +19,21 @@ describe('/hook route verification', () => {
   it('responds with 200 when verified', async () => {
     const server = getTestServer()
 
+    const timestamp = 123456789
+    const payload = {
+      payload: {
+        object: {},
+      },
+    }
     const response = await server.inject({
       url: '/hook',
       method: 'POST',
       headers: {
-        Authorization: process.env.VERIFICATION_TOKEN,
         clientid: process.env.CLIENT_ID,
+        'x-zm-request-timestamp': timestamp,
+        'x-zm-signature': createVerificationSignature(timestamp, payload),
       },
-      payload: {
-        payload: {
-          object: {},
-        },
-      },
+      payload,
     })
 
     expect(response.statusCode).toBe(200)
@@ -53,26 +57,29 @@ describe('/hook route logic', () => {
 
     expect(meetings.rows[0].users).not.toContain('new-user-id')
 
+    const timestamp = 123456789
+    const payload = {
+      event: EVENT_PARTICIPANT_JOINED,
+      payload: {
+        object: {
+          id: 'test_meeting_id',
+          host_id: 'test_host_id',
+          participant: {
+            id: 'new-user-id',
+            user_name: 'new user',
+          },
+        },
+      },
+    }
     const response = await server.inject({
       url: '/hook',
       method: 'POST',
       headers: {
-        Authorization: process.env.VERIFICATION_TOKEN,
         clientid: process.env.CLIENT_ID,
+        'x-zm-request-timestamp': timestamp,
+        'x-zm-signature': createVerificationSignature(timestamp, payload),
       },
-      payload: {
-        event: EVENT_PARTICIPANT_JOINED,
-        payload: {
-          object: {
-            id: 'test_meeting_id',
-            host_id: 'test_host_id',
-            participant: {
-              id: 'new-user-id',
-              user_name: 'new user',
-            },
-          },
-        },
-      },
+      payload,
     })
 
     meetings = await server.pg.query(
@@ -99,26 +106,29 @@ describe('/hook route logic', () => {
 
     expect(meetings.rows.length).toBe(0)
 
+    const timestamp = 123456789
+    const payload = {
+      event: EVENT_PARTICIPANT_JOINED,
+      payload: {
+        object: {
+          id: 'test_meeting_id_2',
+          host_id: 'test_host_id',
+          participant: {
+            id: 'new-user-id',
+            user_name: 'new user',
+          },
+        },
+      },
+    }
     const response = await server.inject({
       url: '/hook',
       method: 'POST',
       headers: {
-        Authorization: process.env.VERIFICATION_TOKEN,
         clientid: process.env.CLIENT_ID,
+        'x-zm-request-timestamp': timestamp,
+        'x-zm-signature': createVerificationSignature(timestamp, payload),
       },
-      payload: {
-        event: EVENT_PARTICIPANT_JOINED,
-        payload: {
-          object: {
-            id: 'test_meeting_id_2',
-            host_id: 'test_host_id',
-            participant: {
-              id: 'new-user-id',
-              user_name: 'new user',
-            },
-          },
-        },
-      },
+      payload,
     })
 
     meetings = await server.pg.query(
@@ -145,47 +155,52 @@ describe('/hook route logic', () => {
 
     expect(meetings.rows.length).toBe(0)
 
+    const timestamp = 123456789
+    let payload = {
+      event: EVENT_PARTICIPANT_JOINED,
+      payload: {
+        object: {
+          id: 'test_meeting_id_2',
+          host_id: 'test_host_id',
+          participant: {
+            user_name: 'new user',
+          },
+        },
+      },
+    }
     const response = await server.inject({
       url: '/hook',
       method: 'POST',
       headers: {
-        Authorization: process.env.VERIFICATION_TOKEN,
         clientid: process.env.CLIENT_ID,
+        'x-zm-request-timestamp': timestamp,
+        'x-zm-signature': createVerificationSignature(timestamp, payload),
       },
+      payload,
+    })
+
+    payload = {
+      event: EVENT_PARTICIPANT_JOINED,
       payload: {
-        event: EVENT_PARTICIPANT_JOINED,
-        payload: {
-          object: {
-            id: 'test_meeting_id_2',
-            host_id: 'test_host_id',
-            participant: {
-              user_name: 'new user',
-            },
+        object: {
+          id: 'test_meeting_id_2',
+          host_id: 'test_host_id',
+          participant: {
+            id: 'new-user-id',
+            user_name: 'new user',
           },
         },
       },
-    })
-
+    }
     await server.inject({
       url: '/hook',
       method: 'POST',
       headers: {
-        Authorization: process.env.VERIFICATION_TOKEN,
         clientid: process.env.CLIENT_ID,
+        'x-zm-request-timestamp': timestamp,
+        'x-zm-signature': createVerificationSignature(timestamp, payload),
       },
-      payload: {
-        event: EVENT_PARTICIPANT_JOINED,
-        payload: {
-          object: {
-            id: 'test_meeting_id_2',
-            host_id: 'test_host_id',
-            participant: {
-              id: 'new-user-id',
-              user_name: 'new user',
-            },
-          },
-        },
-      },
+      payload,
     })
 
     meetings = await server.pg.query(
@@ -215,26 +230,29 @@ describe('/hook route logic', () => {
       '680eda40e80d89c8b3d7fdfe074042e9'
     )
 
+    const timestamp = 123456789
+    const payload = {
+      event: EVENT_PARTICIPANT_LEFT,
+      payload: {
+        object: {
+          id: 'test_meeting_id',
+          host_id: 'test_host_id',
+          participant: {
+            id: 'test_user_id',
+            user_name: 'test_user',
+          },
+        },
+      },
+    }
     const response = await server.inject({
       url: '/hook',
       method: 'POST',
       headers: {
-        Authorization: process.env.VERIFICATION_TOKEN,
         clientid: process.env.CLIENT_ID,
+        'x-zm-request-timestamp': timestamp,
+        'x-zm-signature': createVerificationSignature(timestamp, payload),
       },
-      payload: {
-        event: EVENT_PARTICIPANT_LEFT,
-        payload: {
-          object: {
-            id: 'test_meeting_id',
-            host_id: 'test_host_id',
-            participant: {
-              id: 'test_user_id',
-              user_name: 'test_user',
-            },
-          },
-        },
-      },
+      payload,
     })
 
     meetings = await server.pg.query(
@@ -261,22 +279,25 @@ describe('/hook route logic', () => {
 
     expect(meetings.rows.length).toBe(1)
 
+    const timestamp = 123456789
+    const payload = {
+      event: EVENT_MEETING_ENDED,
+      payload: {
+        object: {
+          id: 'test_meeting_id',
+          host_id: 'test_host_id',
+        },
+      },
+    }
     const response = await server.inject({
       url: '/hook',
       method: 'POST',
       headers: {
-        Authorization: process.env.VERIFICATION_TOKEN,
         clientid: process.env.CLIENT_ID,
+        'x-zm-request-timestamp': timestamp,
+        'x-zm-signature': createVerificationSignature(timestamp, payload),
       },
-      payload: {
-        event: EVENT_MEETING_ENDED,
-        payload: {
-          object: {
-            id: 'test_meeting_id',
-            host_id: 'test_host_id',
-          },
-        },
-      },
+      payload,
     })
 
     meetings = await server.pg.query('SELECT id FROM meetings WHERE id=$1', [
