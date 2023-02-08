@@ -6,16 +6,17 @@ import sortRandomly from '../helpers/sortRandomly.js'
 export default async function (fastify) {
   fastify.post(
     '/bot',
-    { onRequest: [fastify.zoom.verifyRequest] },
+    { preHandler: [fastify.zoom.verifyRequest] },
     async (req, res) => {
       try {
         const {
-          payload: { toJid, accountId, userId, cmd, userName },
+          payload: { toJid, userJid, accountId, userId, cmd, userName },
         } = req.body
 
         const sendMessage = (content, isMarkdown) => {
           return fastify.zoom.sendBotMessage({
             toJid,
+            userJid,
             accountId,
             content,
             isMarkdown,

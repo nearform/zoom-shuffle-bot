@@ -3,20 +3,31 @@ import {
   removeMeeting,
   removeParticipant,
 } from '../services/db.js'
-import { encrypt } from '../helpers/crypto.js'
+import { encrypt, createHmacHash } from '../helpers/crypto.js'
 import {
   EVENT_MEETING_ENDED,
   EVENT_PARTICIPANT_JOINED,
   EVENT_PARTICIPANT_LEFT,
+  EVENT_URL_VALIDATION,
 } from '../const.js'
 
 export default async function (fastify) {
   fastify.post(
     '/hook',
-    { onRequest: fastify.zoom.verifyRequest },
+    { preHandler: fastify.zoom.verifyRequest },
     async (req, res) => {
+      const { event } = req.body
+
+      if (event === EVENT_URL_VALIDATION) {
+        const hashForValidation = createHmacHash(req.body.payload.plainToken)
+
+        return res.code(200).send({
+          plainToken: req.body.payload.plainToken,
+          encryptedToken: hashForValidation,
+        })
+      }
+
       const {
-        event,
         payload: {
           object: { id: meeting_id, host_id, participant },
         },

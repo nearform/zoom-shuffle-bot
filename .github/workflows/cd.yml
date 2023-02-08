@@ -116,8 +116,8 @@ jobs:
             echo "${{ secrets.ZOOM_REDIRECT_URL }}" | tr -d '\n' | gcloud secrets versions add shuffle-redirect-url --data-file=-
           fi
 
-          if [ "${{ secrets.ZOOM_VERIFICATION_TOKEN }}" != "$(gcloud secrets versions access latest --secret shuffle-verification-token)" ]; then
-            echo "${{ secrets.ZOOM_VERIFICATION_TOKEN }}" | tr -d '\n' | gcloud secrets versions add shuffle-verification-token --data-file=-
+          if [ "${{ secrets.ZOOM_SECRET_TOKEN }}" != "$(gcloud secrets versions access latest --secret shuffle-secret-token)" ]; then
+            echo "${{ secrets.ZOOM_SECRET_TOKEN }}" | tr -d '\n' | gcloud secrets versions add shuffle-secret-token --data-file=-
           fi
 
       - name: 'Deploy to Cloud Run'
@@ -140,7 +140,7 @@ jobs:
             CLIENT_SECRET=shuffle-client-secret:latest,
             BOT_JID=shuffle-bot-jid:latest,
             REDIRECT_URL=shuffle-redirect-url:latest,
-            VERIFICATION_TOKEN=shuffle-verification-token:latest'
+            SECRET_TOKEN=shuffle-secret-token:latest'
 
       - name: 'Retrieve the Cloud Run service url'
         run: echo "RUN_URL=$(gcloud run services describe ${{ secrets.RUN_SERVICE_NAME }} --region=${{ env.GCP_REGION }} --format="value(status.url)")" >> $GITHUB_ENV
