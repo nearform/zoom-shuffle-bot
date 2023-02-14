@@ -56,8 +56,7 @@ jobs:
         run: >-
           gcloud sql instances create ${{ secrets.SQL_INSTANCE_NAME }}
           --database-version=POSTGRES_14 
-          --cpu=${{ secrets.SQL_INSTANCE_CPU }}
-          --memory=${{ secrets.SQL_INSTANCE_MEM }}
+          --tier=db-f1-micro
           --region=${{ env.GCP_REGION }}
           --root-password=${{ secrets.SQL_ROOT_PASSWORD }}
 
