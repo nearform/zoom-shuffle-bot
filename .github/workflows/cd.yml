@@ -15,6 +15,10 @@ on:
         description: 'Cloud SQL database name'
         required: true
         default: 'shuffle-bot-test'
+      sql_database_tier:
+        description: 'Cloud SQL database tier'
+        required: true
+        default: 'db-f1-micro'
 
 jobs:
   provision:
@@ -29,6 +33,7 @@ jobs:
       GCP_PROJECT_ID: shuffle-zoom-bot
       GCP_REGION: europe-west1
       SQL_DATABASE_NAME: ${{ github.event.inputs.sql_database_name || secrets.SQL_DATABASE_NAME }}
+      SQL_DATABASE_TIER: ${{ github.event.inputs.sql_database_tier || secrets.SQL_DATABASE_TIER }}
       RUN_SERVICE_NAME: ${{ github.event.inputs.run_service_name || secrets.RUN_SERVICE_NAME }}
     steps:
       - uses: actions/checkout@v3
@@ -56,8 +61,7 @@ jobs:
         run: >-
           gcloud sql instances create ${{ secrets.SQL_INSTANCE_NAME }}
           --database-version=POSTGRES_14 
-          --cpu=${{ secrets.SQL_INSTANCE_CPU }}
-          --memory=${{ secrets.SQL_INSTANCE_MEM }}
+          --tier=${{ env.SQL_DATABASE_TIER }}
           --region=${{ env.GCP_REGION }}
           --root-password=${{ secrets.SQL_ROOT_PASSWORD }}
 
