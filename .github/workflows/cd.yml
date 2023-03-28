@@ -80,44 +80,19 @@ jobs:
       - name: 'Retrieve the Cloud SQL connection name'
         run: echo "SQL_HOST=/cloudsql/$(gcloud sql instances describe --format="value(connectionName)" ${{ secrets.SQL_INSTANCE_NAME }})" >> $GITHUB_ENV
 
-      - name: Update the secrets
-        run: |
-          # update the secrets
-          if [ "${{ env.SQL_HOST }}" != "$(gcloud secrets versions access latest --secret shuffle-db-host)" ]; then
-            echo "${{ env.SQL_HOST }}" | tr -d '\n' | gcloud secrets versions add shuffle-db-host --data-file=-
-          fi
-
-          if [ "${{ secrets.SQL_ROOT_USERNAME }}" != "$(gcloud secrets versions access latest --secret shuffle-db-username)" ]; then
-            echo "${{ secrets.SQL_ROOT_USERNAME }}" | tr -d '\n' | gcloud secrets versions add shuffle-db-username --data-file=-
-          fi
-
-          if [ "${{ secrets.SQL_ROOT_PASSWORD }}" != "$(gcloud secrets versions access latest --secret shuffle-db-password)" ]; then
-            echo "${{ secrets.SQL_ROOT_PASSWORD }}" | tr -d '\n' | gcloud secrets versions add shuffle-db-password --data-file=-
-          fi
-
-          if [ "${{ secrets.SQL_DATABASE_NAME }}" != "$(gcloud secrets versions access latest --secret shuffle-db-name)" ]; then
-            echo "${{ secrets.SQL_DATABASE_NAME }}" | tr -d '\n' | gcloud secrets versions add shuffle-db-name --data-file=-
-          fi
-
-          if [ "${{ secrets.ZOOM_CLIENT_ID }}" != "$(gcloud secrets versions access latest --secret shuffle-client-id)" ]; then
-            echo "${{ secrets.ZOOM_CLIENT_ID }}" | tr -d '\n' | gcloud secrets versions add shuffle-client-id --data-file=-
-          fi
-
-          if [ "${{ secrets.ZOOM_CLIENT_SECRET }}" != "$(gcloud secrets versions access latest --secret shuffle-client-secret)" ]; then
-            echo "${{ secrets.ZOOM_CLIENT_SECRET }}" | tr -d '\n' | gcloud secrets versions add shuffle-client-secret --data-file=-
-          fi
-
-          if [ "${{ secrets.ZOOM_BOT_JID }}" != "$(gcloud secrets versions access latest --secret shuffle-bot-jid)" ]; then
-            echo "${{ secrets.ZOOM_BOT_JID }}" | tr -d '\n' | gcloud secrets versions add shuffle-bot-jid --data-file=-
-          fi
-
-          if [ "${{ secrets.ZOOM_REDIRECT_URL }}" != "$(gcloud secrets versions access latest --secret shuffle-redirect-url)" ]; then
-            echo "${{ secrets.ZOOM_REDIRECT_URL }}" | tr -d '\n' | gcloud secrets versions add shuffle-redirect-url --data-file=-
-          fi
-
-          if [ "${{ secrets.ZOOM_SECRET_TOKEN }}" != "$(gcloud secrets versions access latest --secret shuffle-secret-token)" ]; then
-            echo "${{ secrets.ZOOM_SECRET_TOKEN }}" | tr -d '\n' | gcloud secrets versions add shuffle-secret-token --data-file=-
-          fi
+      - name: Update secrets in GCP Secret Manager
+        uses: nearform-actions/github-action-gcp-secrets@v1
+        with:
+          secrets: |-
+            shuffle-db-host:"${{ env.SQL_HOST }}"
+            shuffle-db-username:"${{ secrets.SQL_ROOT_USERNAME }}"
+            shuffle-db-password:"${{ secrets.SQL_ROOT_PASSWORD }}"
+            shuffle-db-name:"${{ secrets.SQL_DATABASE_NAME }}"
+            shuffle-client-id:"${{ secrets.ZOOM_CLIENT_ID }}"
+            shuffle-client-secret:"${{ secrets.ZOOM_CLIENT_SECRET }}"
+            shuffle-bot-jid:"${{ secrets.ZOOM_BOT_JID }}"
+            shuffle-redirect-url:"${{ secrets.ZOOM_REDIRECT_URL }}"
+            shuffle-secret-token:"${{ secrets.ZOOM_SECRET_TOKEN }}"
 
       - name: 'Deploy to Cloud Run'
         id: deploy
