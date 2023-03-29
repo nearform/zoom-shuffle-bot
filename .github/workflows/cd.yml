@@ -99,11 +99,11 @@ jobs:
           --revision-suffix=${{ github.sha }}
           --source=.
           --set-env-vars='NODE_ENV=production'
-          --set-env-vars='CLIENT_ID=${vars.ZOOM_CLIENT_ID}'
-          --set-env-vars='DB_HOST=${vars.SQL_DB_HOST}'
-          --set-env-vars='DB_USER=${vars.SQL_ROOT_USER}'
-          --set-env-vars='DB_NAME=${env.SQL_DATABASE_NAME}'
-          --set-env-vars='REDIRECT_URL=${vars.REDIRECT_URL}'
+          --set-env-vars='CLIENT_ID=${{ vars.ZOOM_CLIENT_ID }}'
+          --set-env-vars='DB_HOST=${{ vars.SQL_DB_HOST }}'
+          --set-env-vars='DB_USER=${{ vars.SQL_ROOT_USER }}'
+          --set-env-vars='DB_NAME=${{ env.SQL_DATABASE_NAME }}'
+          --set-env-vars='REDIRECT_URL=${{ vars.REDIRECT_URL }}'
           --set-secrets='
             DB_PASSWORD=shuffle-db-password:latest,
             CLIENT_SECRET=shuffle-client-secret:latest,
