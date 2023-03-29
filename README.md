@@ -122,7 +122,7 @@ Google Cloud Platform.
 The Continuous Delivery workflow can be triggered manually in the `Actions` tab (the test database and Run instance have
 to be removed manually).
 
-To make the CD pipeline work, you need to set up the following secrets:
+To make the CD pipeline work, you need to set up the following variables:
 
 - `GCP_WORKLOAD_IDENTITY_PROVIDER`,
 - `GCP_PROJECT_ID`,
@@ -134,29 +134,16 @@ To make the CD pipeline work, you need to set up the following secrets:
 - `SQL_INSTANCE_CPU`,
 - `SQL_INSTANCE_MEM`,
 - `SQL_INSTANCE_NAME`,
-- `SQL_ROOT_PASSWORD`,
 - `SQL_ROOT_USERNAME`,
-- `ZOOM_BOT_JID`,
 - `ZOOM_CLIENT_ID`,
-- `ZOOM_CLIENT_SECRET`,
 - `ZOOM_REDIRECT_URL`,
+
+To make the CD pipeline work, you need to set up the following secrets:
+
+- `SQL_ROOT_PASSWORD`,
+- `ZOOM_BOT_JID`,
+- `ZOOM_CLIENT_SECRET`,
 - `ZOOM_SECRET_TOKEN`
-
-## GCP Secret Manager
-
-This repo uses Secret Manager to manage Cloud Run services' secrets. That means you need to grant the `Secret Manager Accessor` permission to the Service Account used to run the Cloud Run service so it can query the secret values.
-
-Also, you need to manually create the following secrets in Secret Manager:
-
-- `shuffle-db-host`
-- `shuffle-db-username`
-- `shuffle-db-password`
-- `shuffle-db-name`
-- `shuffle-client-id`
-- `shuffle-client-secret`
-- `shuffle-bot-jid`
-- `shuffle-redirect-url`
-- `shuffle-secret-token`
 
 ## Monitoring and logs
 

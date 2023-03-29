@@ -26,27 +26,26 @@ jobs:
       id-token: write
 
     env:
-      GCP_PROJECT_ID: shuffle-zoom-bot
       GCP_REGION: europe-west1
-      SQL_DATABASE_NAME: ${{ github.event.inputs.sql_database_name || secrets.SQL_DATABASE_NAME }}
-      RUN_SERVICE_NAME: ${{ github.event.inputs.run_service_name || secrets.RUN_SERVICE_NAME }}
+      SQL_DATABASE_NAME: ${{ github.event.inputs.sql_database_name || vars.SQL_DB_NAME }}
+      RUN_SERVICE_NAME: ${{ github.event.inputs.run_service_name || vars.GCP_RUN_SERVICE_NAME }}
     steps:
       - uses: actions/checkout@v3
 
       - name: 'Authenticate with GCP'
         uses: google-github-actions/auth@v1
         with:
-          workload_identity_provider: ${{ secrets.GCP_WORKLOAD_IDENTITY_PROVIDER }}
-          service_account: ${{ secrets.GCP_SERVICE_ACCOUNT }}
+          workload_identity_provider: ${{ vars.GCP_WORKLOAD_IDENTITY_PROVIDER }}
+          service_account: ${{ vars.GCP_SERVICE_ACCOUNT }}
 
       - name: 'Set up Cloud SDK'
         uses: google-github-actions/setup-gcloud@v1
         with:
-          project_id: ${{ secrets.GCP_PROJECT_ID }}
+          project_id: ${{ vars.GCP_PROJECT_ID }}
 
       - name: 'Check if Cloud SQL Instance exists'
         run: >-
-          gcloud sql instances describe ${{ secrets.SQL_INSTANCE_NAME }} 
+          gcloud sql instances describe ${{ vars.SQL_DB_INSTANCE_NAME }} 
           --format="value(name)" 
           >/dev/null 2>/dev/null
           || echo "PROVISION_SQL_INSTANCE=true" >> $GITHUB_ENV
@@ -54,7 +53,7 @@ jobs:
       - name: 'Provision Cloud SQL Instance'
         if: env.PROVISION_SQL_INSTANCE == 'true'
         run: >-
-          gcloud sql instances create ${{ secrets.SQL_INSTANCE_NAME }}
+          gcloud sql instances create ${{ vars.SQL_DB_INSTANCE_NAME }}
           --database-version=POSTGRES_14 
           --tier=db-f1-micro
           --region=${{ env.GCP_REGION }}
@@ -63,7 +62,7 @@ jobs:
       - name: 'Check if Cloud SQL Database exists'
         run: >-
           gcloud sql databases describe ${{ env.SQL_DATABASE_NAME }}
-          --instance=${{ secrets.SQL_INSTANCE_NAME }} 
+          --instance=${{ vars.SQL_DB_INSTANCE_NAME }} 
           --format="value(name)"  
           >/dev/null 2>/dev/null
           || echo "PROVISION_SQL_DATABASE=true" >> $GITHUB_ENV
@@ -72,81 +71,51 @@ jobs:
         if: env.PROVISION_SQL_DATABASE == 'true'
         run: >-
           gcloud sql databases create ${{ env.SQL_DATABASE_NAME }}
-          --instance=${{ secrets.SQL_INSTANCE_NAME }}
+          --instance=${{ vars.SQL_DB_INSTANCE_NAME }}
 
       - name: 'Authorize Docker push'
         run: gcloud auth configure-docker
 
       - name: 'Retrieve the Cloud SQL connection name'
-        run: echo "SQL_HOST=/cloudsql/$(gcloud sql instances describe --format="value(connectionName)" ${{ secrets.SQL_INSTANCE_NAME }})" >> $GITHUB_ENV
+        run: echo "SQL_HOST=/cloudsql/$(gcloud sql instances describe --format="value(connectionName)" ${{ vars.SQL_DB_INSTANCE_NAME }})" >> $GITHUB_ENV
 
-      - name: Update the secrets
-        run: |
-          # update the secrets
-          if [ "${{ env.SQL_HOST }}" != "$(gcloud secrets versions access latest --secret shuffle-db-host)" ]; then
-            echo "${{ env.SQL_HOST }}" | tr -d '\n' | gcloud secrets versions add shuffle-db-host --data-file=-
-          fi
-
-          if [ "${{ secrets.SQL_ROOT_USERNAME }}" != "$(gcloud secrets versions access latest --secret shuffle-db-username)" ]; then
-            echo "${{ secrets.SQL_ROOT_USERNAME }}" | tr -d '\n' | gcloud secrets versions add shuffle-db-username --data-file=-
-          fi
-
-          if [ "${{ secrets.SQL_ROOT_PASSWORD }}" != "$(gcloud secrets versions access latest --secret shuffle-db-password)" ]; then
-            echo "${{ secrets.SQL_ROOT_PASSWORD }}" | tr -d '\n' | gcloud secrets versions add shuffle-db-password --data-file=-
-          fi
-
-          if [ "${{ secrets.SQL_DATABASE_NAME }}" != "$(gcloud secrets versions access latest --secret shuffle-db-name)" ]; then
-            echo "${{ secrets.SQL_DATABASE_NAME }}" | tr -d '\n' | gcloud secrets versions add shuffle-db-name --data-file=-
-          fi
-
-          if [ "${{ secrets.ZOOM_CLIENT_ID }}" != "$(gcloud secrets versions access latest --secret shuffle-client-id)" ]; then
-            echo "${{ secrets.ZOOM_CLIENT_ID }}" | tr -d '\n' | gcloud secrets versions add shuffle-client-id --data-file=-
-          fi
-
-          if [ "${{ secrets.ZOOM_CLIENT_SECRET }}" != "$(gcloud secrets versions access latest --secret shuffle-client-secret)" ]; then
-            echo "${{ secrets.ZOOM_CLIENT_SECRET }}" | tr -d '\n' | gcloud secrets versions add shuffle-client-secret --data-file=-
-          fi
-
-          if [ "${{ secrets.ZOOM_BOT_JID }}" != "$(gcloud secrets versions access latest --secret shuffle-bot-jid)" ]; then
-            echo "${{ secrets.ZOOM_BOT_JID }}" | tr -d '\n' | gcloud secrets versions add shuffle-bot-jid --data-file=-
-          fi
-
-          if [ "${{ secrets.ZOOM_REDIRECT_URL }}" != "$(gcloud secrets versions access latest --secret shuffle-redirect-url)" ]; then
-            echo "${{ secrets.ZOOM_REDIRECT_URL }}" | tr -d '\n' | gcloud secrets versions add shuffle-redirect-url --data-file=-
-          fi
-
-          if [ "${{ secrets.ZOOM_SECRET_TOKEN }}" != "$(gcloud secrets versions access latest --secret shuffle-secret-token)" ]; then
-            echo "${{ secrets.ZOOM_SECRET_TOKEN }}" | tr -d '\n' | gcloud secrets versions add shuffle-secret-token --data-file=-
-          fi
+      - name: Update secrets in GCP Secret Manager
+        uses: nearform-actions/github-action-gcp-secrets@v1
+        with:
+          secrets: |-
+            shuffle-db-password:"${{ secrets.SQL_ROOT_PASSWORD }}"
+            shuffle-client-secret:"${{ secrets.ZOOM_CLIENT_SECRET }}"
+            shuffle-bot-jid:"${{ secrets.ZOOM_BOT_JID }}"
+            shuffle-secret-token:"${{ secrets.ZOOM_SECRET_TOKEN }}"
 
       - name: 'Deploy to Cloud Run'
         id: deploy
         run: >-
-          gcloud run deploy ${{ secrets.RUN_SERVICE_NAME }}
+          gcloud run deploy ${{ env.RUN_SERVICE_NAME }}
           --region=${{ env.GCP_REGION }}
-          --cpu=${{ secrets.RUN_CPU }}
-          --memory=${{ secrets.RUN_MEM }}
-          --set-cloudsql-instances=${{ secrets.SQL_INSTANCE_NAME }}
+          --cpu=${{ vars.RUN_CPU }}
+          --memory=${{ vars.RUN_MEM }}
+          --set-cloudsql-instances=${{ vars.SQL_DB_INSTANCE_NAME }}
           --revision-suffix=${{ github.sha }}
           --source=.
           --set-env-vars='NODE_ENV=production'
+          --set-env-vars='CLIENT_ID=${{ vars.ZOOM_CLIENT_ID }}'
+          --set-env-vars='DB_HOST=${{ vars.SQL_DB_HOST }}'
+          --set-env-vars='DB_USER=${{ vars.SQL_ROOT_USER }}'
+          --set-env-vars='DB_NAME=${{ env.SQL_DATABASE_NAME }}'
+          --set-env-vars='REDIRECT_URL=${{ vars.REDIRECT_URL }}'
           --set-secrets='
-            DB_USER=shuffle-db-username:latest,
             DB_PASSWORD=shuffle-db-password:latest,
-            DB_HOST=shuffle-db-host:latest,
-            DB_NAME=shuffle-db-name:latest,
-            CLIENT_ID=shuffle-client-id:latest,
             CLIENT_SECRET=shuffle-client-secret:latest,
             BOT_JID=shuffle-bot-jid:latest,
-            REDIRECT_URL=shuffle-redirect-url:latest,
             SECRET_TOKEN=shuffle-secret-token:latest'
 
       - name: 'Retrieve the Cloud Run service url'
-        run: echo "RUN_URL=$(gcloud run services describe ${{ secrets.RUN_SERVICE_NAME }} --region=${{ env.GCP_REGION }} --format="value(status.url)")" >> $GITHUB_ENV
+        run: echo "RUN_URL=$(gcloud run services describe ${{ env.RUN_SERVICE_NAME }} --region=${{ env.GCP_REGION }} --format="value(status.url)")" >> $GITHUB_ENV
 
       - name: 'Make the service public'
         run: >-
-          gcloud run services add-iam-policy-binding ${{ secrets.RUN_SERVICE_NAME }}
+          gcloud run services add-iam-policy-binding ${{ env.RUN_SERVICE_NAME }}
           --member="allUsers"
           --role="roles/run.invoker"
           --region=${{ env.GCP_REGION }}
