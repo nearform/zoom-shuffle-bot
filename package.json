@@ -1,6 +1,6 @@
 {
   "name": "zoom-shuffle-bot",
-  "version": "2.1.5",
+  "version": "2.1.6",
   "description": "",
   "main": "chatbot.js",
   "type": "module",
