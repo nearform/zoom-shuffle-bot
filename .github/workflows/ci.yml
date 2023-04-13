@@ -10,7 +10,6 @@ jobs:
     env:
       FIRESTORE_COLLECTION: shuffle-bot-test
       FIRESTORE_EMULATOR_HOST: localhost:8081
-      GCP_PROJECT: ${{ vars.GCP_PROJECT_ID }}
     steps:
       - uses: actions/checkout@v3
       - uses: actions/setup-node@v3

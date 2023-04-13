@@ -7,7 +7,7 @@
   "scripts": {
     "test": "npm run test:unit && npm run test:integration",
     "test:unit": "jest --testPathIgnorePatterns=test/integration",
-    "test:integration": "firebase emulators:exec --only firestore \"jest --testPathPattern=test/integration --runInBand\"",
+    "test:integration": "firebase emulators:exec --only firestore  --project shuffle-zoom-bot \"jest --testPathPattern=test/integration --runInBand\"",
     "start": "node chatbot.js",
     "dev": "nodemon chatbot.js",
     "lint": "eslint . --ext .js,.cjs",
