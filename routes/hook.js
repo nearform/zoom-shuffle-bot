@@ -35,7 +35,7 @@ export default async function (fastify) {
 
       if (event === EVENT_PARTICIPANT_JOINED) {
         await addParticipant(
-          fastify.pg,
+          fastify.firestore,
           meeting_id,
           host_id,
           participant.participant_user_id || participant.id,
@@ -45,7 +45,7 @@ export default async function (fastify) {
 
       if (event === EVENT_PARTICIPANT_LEFT) {
         await removeParticipant(
-          fastify.pg,
+          fastify.firestore,
           meeting_id,
           participant.participant_user_id || participant.id,
           encrypt(participant.user_name)
@@ -53,7 +53,7 @@ export default async function (fastify) {
       }
 
       if (event === EVENT_MEETING_ENDED) {
-        await removeMeeting(fastify.pg, meeting_id)
+        await removeMeeting(fastify.firestore, meeting_id)
       }
 
       res.code(200).send()

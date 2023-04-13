@@ -9,7 +9,7 @@ describe('/bot route', () => {
   let server
   const mockSendBotMessage = jest.fn()
   const mockFetch = jest.fn()
-  const mockPg = jest.fn()
+  const mockFirestore = jest.fn()
   // eslint-disable-next-line no-import-assign
   db.getUserActiveMeeting = jest.fn()
 
@@ -20,7 +20,7 @@ describe('/bot route', () => {
       sendBotMessage: mockSendBotMessage,
       fetch: mockFetch,
     })
-    server.decorate('pg', mockPg)
+    server.decorate('firestore', mockFirestore)
     server.register(bot)
     await server.ready()
   })
@@ -56,7 +56,10 @@ describe('/bot route', () => {
     })
 
     expect(response.statusCode).toBe(200)
-    expect(db.getUserActiveMeeting).toHaveBeenCalledWith(mockPg, '1239999')
+    expect(db.getUserActiveMeeting).toHaveBeenCalledWith(
+      mockFirestore,
+      '1239999'
+    )
     expect(mockSendBotMessage).toHaveBeenNthCalledWith(1, {
       accountId: '999999999',
       content: {
@@ -107,7 +110,10 @@ describe('/bot route', () => {
     })
 
     expect(response.statusCode).toBe(200)
-    expect(db.getUserActiveMeeting).toHaveBeenCalledWith(mockPg, '1239999')
+    expect(db.getUserActiveMeeting).toHaveBeenCalledWith(
+      mockFirestore,
+      '1239999'
+    )
     expect(mockSendBotMessage).toHaveBeenNthCalledWith(1, {
       accountId: '999999999',
       content: {
@@ -156,7 +162,10 @@ describe('/bot route', () => {
     })
 
     expect(response.statusCode).toBe(200)
-    expect(db.getUserActiveMeeting).toHaveBeenCalledWith(mockPg, '1239999')
+    expect(db.getUserActiveMeeting).toHaveBeenCalledWith(
+      mockFirestore,
+      '1239999'
+    )
     expect(mockSendBotMessage).toHaveBeenCalledWith({
       accountId: '999999999',
       content: {
@@ -187,7 +196,10 @@ describe('/bot route', () => {
     })
 
     expect(response.statusCode).toBe(200)
-    expect(db.getUserActiveMeeting).toHaveBeenCalledWith(mockPg, '1239999')
+    expect(db.getUserActiveMeeting).toHaveBeenCalledWith(
+      mockFirestore,
+      '1239999'
+    )
     expect(mockSendBotMessage).toHaveBeenCalledWith({
       accountId: '999999999',
       content: {

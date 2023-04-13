@@ -11,11 +11,7 @@ const schema = S.object()
   .prop('BOT_JID', S.string().required())
   .prop('SECRET_TOKEN', S.string().required())
   .prop('REDIRECT_URL', S.string().required())
-  .prop('DB_HOST', S.string().default('localhost'))
-  .prop('DB_PORT', S.number().default(5432))
-  .prop('DB_USER', S.string().default('postgres'))
-  .prop('DB_PASSWORD', S.string().default('postgres'))
-  .prop('DB_NAME', S.string().default('postgres'))
+  .prop('FIRESTORE_COLLECTION', S.string().default('shuffle-bot-test'))
 
 const config = envSchema({
   schema,

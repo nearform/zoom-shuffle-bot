@@ -7,18 +7,16 @@ import {
 import resetDatabase from './resetDatabase.js'
 import { createVerificationSignature } from '../../helpers/crypto.js'
 
+const server = getTestServer()
+
 describe('/hook route verification', () => {
   it('responds with 401 when not verified', async () => {
-    const server = getTestServer()
-
     const response = await server.inject({ url: '/hook', method: 'POST' })
 
     expect(response.statusCode).toBe(401)
   })
 
   it('responds with 200 when verified', async () => {
-    const server = getTestServer()
-
     const timestamp = 123456789
     const payload = {
       payload: {
@@ -42,20 +40,15 @@ describe('/hook route verification', () => {
 
 describe('/hook route logic', () => {
   beforeEach(async () => {
-    await resetDatabase()
+    await resetDatabase(server)
   })
 
   it('adds a meeting participant when a meeting is joined (and the meeting exists)', async () => {
-    const server = getTestServer()
+    let meeting = await server.firestore
+      .doc('meeting/meetings/test_meeting_id')
+      .get()
 
-    await server.ready()
-
-    let meetings = await server.pg.query(
-      'SELECT users FROM meetings WHERE id=$1',
-      ['test_meeting_id']
-    )
-
-    expect(meetings.rows[0].users).not.toContain('new-user-id')
+    expect(meeting.data().users).not.toContain('new-user-id')
 
     const timestamp = 123456789
     const payload = {
@@ -82,29 +75,23 @@ describe('/hook route logic', () => {
       payload,
     })
 
-    meetings = await server.pg.query(
-      'SELECT users, participants FROM meetings WHERE id=$1',
-      ['test_meeting_id']
-    )
+    meeting = await server.firestore
+      .doc('meeting/meetings/test_meeting_id')
+      .get()
 
     expect(response.statusCode).toBe(200)
-    expect(meetings.rows[0].users).toContain('new-user-id')
-    expect(meetings.rows[0].participants).toContain(
+    expect(meeting.data().users).toContain('new-user-id')
+    expect(meeting.data().participants).toContain(
       '8a264073297f003d8b022801eaaaffaa'
     )
   })
 
   it("adds a new meeting when participant joins and the meeting doesn't exist", async () => {
-    const server = getTestServer()
+    let meeting = await server.firestore
+      .doc('meeting/meetings/test_meeting_id_2')
+      .get()
 
-    await server.ready()
-
-    let meetings = await server.pg.query(
-      'SELECT users FROM meetings WHERE id=$1',
-      ['test_meeting_id_2']
-    )
-
-    expect(meetings.rows.length).toBe(0)
+    expect(meeting.exists).toBe(false)
 
     const timestamp = 123456789
     const payload = {
@@ -131,29 +118,23 @@ describe('/hook route logic', () => {
       payload,
     })
 
-    meetings = await server.pg.query(
-      'SELECT users, participants FROM meetings WHERE id=$1',
-      ['test_meeting_id_2']
-    )
+    meeting = await server.firestore
+      .doc('meeting/meetings/test_meeting_id_2')
+      .get()
 
     expect(response.statusCode).toBe(200)
-    expect(meetings.rows[0].users).toContain('new-user-id')
-    expect(meetings.rows[0].participants).toContain(
+    expect(meeting.data().users).toContain('new-user-id')
+    expect(meeting.data().participants).toContain(
       '8a264073297f003d8b022801eaaaffaa'
     )
   })
 
   it('adds a new meeting when a non-registered user joins first and a registered user follows', async () => {
-    const server = getTestServer()
+    let meeting = await server.firestore
+      .doc('meeting/meetings/test_meeting_id_2')
+      .get()
 
-    await server.ready()
-
-    let meetings = await server.pg.query(
-      'SELECT users FROM meetings WHERE id=$1',
-      ['test_meeting_id_2']
-    )
-
-    expect(meetings.rows.length).toBe(0)
+    expect(meeting.exists).toBe(false)
 
     const timestamp = 123456789
     let payload = {
@@ -203,30 +184,24 @@ describe('/hook route logic', () => {
       payload,
     })
 
-    meetings = await server.pg.query(
-      'SELECT users, participants FROM meetings WHERE id=$1',
-      ['test_meeting_id_2']
-    )
+    meeting = await server.firestore
+      .doc('meeting/meetings/test_meeting_id_2')
+      .get()
 
     expect(response.statusCode).toBe(200)
-    expect(meetings.rows[0].users).toContain('new-user-id')
-    expect(meetings.rows[0].participants).toContain(
+    expect(meeting.data().users).toContain('new-user-id')
+    expect(meeting.data().participants).toContain(
       '8a264073297f003d8b022801eaaaffaa'
     )
   })
 
   it('removes a meeting participant when they leave', async () => {
-    const server = getTestServer()
+    let meeting = await server.firestore
+      .doc('meeting/meetings/test_meeting_id')
+      .get()
 
-    await server.ready()
-
-    let meetings = await server.pg.query(
-      'SELECT users, participants FROM meetings WHERE id=$1',
-      ['test_meeting_id']
-    )
-
-    expect(meetings.rows[0].users).toContain('test_user_id')
-    expect(meetings.rows[0].participants).toContain(
+    expect(meeting.data().users).toContain('test_user_id')
+    expect(meeting.data().participants).toContain(
       '680eda40e80d89c8b3d7fdfe074042e9'
     )
 
@@ -255,29 +230,23 @@ describe('/hook route logic', () => {
       payload,
     })
 
-    meetings = await server.pg.query(
-      'SELECT users, participants FROM meetings WHERE id=$1',
-      ['test_meeting_id']
-    )
+    meeting = await server.firestore
+      .doc('meeting/meetings/test_meeting_id')
+      .get()
 
     expect(response.statusCode).toBe(200)
-    expect(meetings.rows[0].users).not.toContain('test_user_id')
-    expect(meetings.rows[0].participants).not.toContain(
+    expect(meeting.data().users).not.toContain('test_user_id')
+    expect(meeting.data().participants).not.toContain(
       '680eda40e80d89c8b3d7fdfe074042e9'
     )
   })
 
   it('removes a meeting it ends', async () => {
-    const server = getTestServer()
+    let meeting = await server.firestore
+      .doc('meeting/meetings/test_meeting_id')
+      .get()
 
-    await server.ready()
-
-    let meetings = await server.pg.query(
-      'SELECT id FROM meetings WHERE id=$1',
-      ['test_meeting_id']
-    )
-
-    expect(meetings.rows.length).toBe(1)
+    expect(meeting.exists).toBe(true)
 
     const timestamp = 123456789
     const payload = {
@@ -300,11 +269,11 @@ describe('/hook route logic', () => {
       payload,
     })
 
-    meetings = await server.pg.query('SELECT id FROM meetings WHERE id=$1', [
-      'test_meeting_id',
-    ])
+    meeting = await server.firestore
+      .doc('meeting/meetings/test_meeting_id')
+      .get()
 
     expect(response.statusCode).toBe(200)
-    expect(meetings.rows.length).toBe(0)
+    expect(meeting.exists).toBe(false)
   })
 })

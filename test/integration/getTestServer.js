@@ -9,10 +9,6 @@ export default function getTestServer() {
     BOT_JID: process.env.BOT_JID,
     SECRET_TOKEN: process.env.SECRET_TOKEN,
     REDIRECT_URL: process.env.REDIRECT_URL,
-    DB_USER: process.env.DB_USER,
-    DB_PASSWORD: process.env.DB_PASSWORD,
-    DB_PORT: process.env.DB_PORT,
-    DB_HOST: process.env.DB_HOST,
-    DB_NAME: process.env.DB_NAME,
+    FIRESTORE_COLLECTION: process.env.FIRESTORE_COLLECTION,
   })
 }
