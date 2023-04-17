@@ -12,13 +12,8 @@ export default function buildServer(config) {
     },
   })
 
-  fastify.register(import('@fastify/postgres'), {
-    user: config.DB_USER,
-    password: config.DB_PASSWORD,
-    host: config.DB_HOST,
-    port: config.DB_PORT || 5432,
-    database: config.DB_NAME,
-    ssl: false,
+  fastify.register(import('./plugins/firestore.js'), {
+    collection: config.FIRESTORE_COLLECTION,
   })
 
   fastify.register(import('./plugins/zoom.js'), {

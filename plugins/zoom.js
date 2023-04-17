@@ -16,10 +16,10 @@ async function plugin(fastify, options = {}) {
   )
 
   async function getApiToken(accountId) {
-    const tokenData = await getApiTokenData(fastify.pg, accountId)
+    const tokenData = await getApiTokenData(fastify.firestore, accountId)
 
     if (tokenData && !isTokenExpired(tokenData)) {
-      return tokenData.access_token
+      return tokenData.accessToken
     } else {
       const { access_token, refresh_token, expires_in } =
         await fetchTokenByRefresh(
@@ -29,7 +29,7 @@ async function plugin(fastify, options = {}) {
         )
 
       await upsertApiTokenData(
-        fastify.pg,
+        fastify.firestore,
         accountId,
         access_token,
         refresh_token,
@@ -51,7 +51,7 @@ async function plugin(fastify, options = {}) {
     const { account_id } = await apiFetch(access_token, '/users/me')
 
     await upsertApiTokenData(
-      fastify.pg,
+      fastify.firestore,
       account_id,
       access_token,
       refresh_token,
@@ -61,7 +61,7 @@ async function plugin(fastify, options = {}) {
 
   fastify.decorate('zoom', {
     sendBotMessage: sendBotMessage.bind(null, fastify, options),
-    verifyRequest: verifyRequest.bind(null, options),
+    verifyRequest,
     authorize,
     fetch: async (accountId, endpoint) => {
       const token = await getApiToken(accountId)
@@ -73,5 +73,5 @@ async function plugin(fastify, options = {}) {
 
 export default fp(plugin, {
   name: 'fastify-zoom',
-  dependencies: ['@fastify/postgres'],
+  dependencies: ['zoom-firestore'],
 })

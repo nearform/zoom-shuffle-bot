@@ -8,6 +8,8 @@ import { createVerificationSignature } from '../../helpers/crypto.js'
 jest.mock('../../plugins/sendBotMessage.js')
 jest.mock('../../plugins/apiFetch.js')
 
+const server = getTestServer()
+
 expect.extend({
   botMessageContaining(received, value) {
     return { pass: JSON.stringify(received).includes(value) }
@@ -16,16 +18,12 @@ expect.extend({
 
 describe('/bot route verification', () => {
   it('responds with 401 when not verified', async () => {
-    const server = getTestServer()
-
     const response = await server.inject({ url: '/bot', method: 'POST' })
 
     expect(response.statusCode).toBe(401)
   })
 
   it('responds with 200 when verified', async () => {
-    const server = getTestServer()
-
     const timestamp = 123456789
     const payload = {
       payload: {},
@@ -47,12 +45,10 @@ describe('/bot route verification', () => {
 
 describe('/bot route logic', () => {
   beforeEach(async () => {
-    await resetDatabase()
+    await resetDatabase(server)
   })
 
   it('sends a bot message when user has no active meetings', async () => {
-    const server = getTestServer()
-
     expect(sendBotMessage).not.toHaveBeenCalled()
 
     const timestamp = 123456789
@@ -83,8 +79,6 @@ describe('/bot route logic', () => {
   })
 
   it('sends a bot message with meeting topic and decoded user names when user has an active meeting', async () => {
-    const server = getTestServer()
-
     expect(sendBotMessage).not.toHaveBeenCalled()
     expect(apiFetch).not.toHaveBeenCalled()
 

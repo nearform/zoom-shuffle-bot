@@ -7,22 +7,9 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
-    services:
-      postgres:
-        image: postgres:alpine
-        env:
-          POSTGRES_PASSWORD: postgres
-        ports:
-          - 5434:5432
-        options:
-          --health-cmd pg_isready --health-interval 10s --health-timeout 5s
-          --health-retries 5
     env:
-      DB_HOST: localhost
-      DB_PORT: 5434
-      DB_USER: postgres
-      DB_PASSWORD: postgres
-      DB_NAME: postgres
+      FIRESTORE_COLLECTION: shuffle-bot-test
+      FIRESTORE_EMULATOR_HOST: localhost:8081
     steps:
       - uses: actions/checkout@v3
       - uses: actions/setup-node@v3
@@ -31,8 +18,6 @@ jobs:
       - run: |
           npm ci
           npm run lint
-          npm run db:migrate
-          npm run db:populate
           npm test
   automerge:
     needs: build

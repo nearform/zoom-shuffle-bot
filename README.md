@@ -29,8 +29,6 @@ To avoid privacy issues usernames stored in the database are encrypted using SHA
 ### Requirements
 
 - Node LTS
-- docker
-- docker compose
 
 ### Setting up the local environment
 
@@ -40,25 +38,21 @@ To avoid privacy issues usernames stored in the database are encrypted using SHA
 
    *the missing environment variables will come from the Zoom Chatbot setup in the next steps*👇
 
-2. **Startup the database docker container**
-
-   `npm run db:up`
-
-3. **Install packages**
+2. **Install packages**
 
    `npm install`
 
-4. **Run the database migrations to initialize the database tables**
+3. **Startup the Firestore emulator**
 
-   `npm run db:migrate`
+   `npm run db:up`
 
-5. **Startup the local server with nodemon**
+4. **Startup the local server with nodemon**
 
    `npm run dev`
 
    _node debugger is available on the default port 9229_
 
-6. **Use ngrok to expose the local app**
+5. **Use ngrok to expose the local app**
 
    If you don't have ngrok installed, here you can find the setup instructions: [Ngrok install](https://ngrok.com/download)
 
@@ -67,7 +61,7 @@ To avoid privacy issues usernames stored in the database are encrypted using SHA
 
    `ngrok http 3000` - run this command to expose your local app running on port 3000
 
-7. **Keep note of your public ngrok https url**
+6. **Keep note of your public ngrok https url**
 
    we'll refer to it as `$PUBLIC_URL` in the following steps
    ![Ngrok](https://user-images.githubusercontent.com/5416572/152380581-d9bd7eba-81d3-454a-80eb-d33354daa8d2.png)
@@ -130,17 +124,12 @@ To make the CD pipeline work, you need to set up the following variables:
 - `RUN_CPU`,
 - `RUN_MEM`,
 - `RUN_SERVICE_NAME`,
-- `SQL_DATABASE_NAME`,
-- `SQL_INSTANCE_CPU`,
-- `SQL_INSTANCE_MEM`,
-- `SQL_INSTANCE_NAME`,
-- `SQL_ROOT_USERNAME`,
+- `FIRESTORE_COLLECTION`,
 - `ZOOM_CLIENT_ID`,
 - `ZOOM_REDIRECT_URL`,
 
 To make the CD pipeline work, you need to set up the following secrets:
 
-- `SQL_ROOT_PASSWORD`,
 - `ZOOM_BOT_JID`,
 - `ZOOM_CLIENT_SECRET`,
 - `ZOOM_SECRET_TOKEN`

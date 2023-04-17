@@ -23,7 +23,7 @@ export default async function (fastify) {
           })
         }
 
-        const meeting = await getUserActiveMeeting(fastify.pg, userId)
+        const meeting = await getUserActiveMeeting(fastify.firestore, userId)
 
         if (!meeting || meeting.participants.length === 0) {
           await sendMessage({

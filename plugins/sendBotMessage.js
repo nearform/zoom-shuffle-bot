@@ -6,10 +6,10 @@ import { fetchTokenByCredentials } from './oauth.js'
 import apiFetch from './apiFetch.js'
 
 async function getBotToken(fastify, options, accountId) {
-  const tokenData = await getBotTokenData(fastify.pg, accountId)
+  const tokenData = await getBotTokenData(fastify.firestore, accountId)
 
   if (tokenData && !isTokenExpired(tokenData)) {
-    return tokenData.access_token
+    return tokenData.accessToken
   } else {
     const { access_token, expires_in } = await fetchTokenByCredentials(
       options.clientId,
@@ -17,7 +17,7 @@ async function getBotToken(fastify, options, accountId) {
     )
 
     await upsertBotTokenData(
-      fastify.pg,
+      fastify.firestore,
       accountId,
       access_token,
       getTokenExpiresOn(expires_in)

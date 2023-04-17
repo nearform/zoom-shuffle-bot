@@ -1,105 +1,136 @@
-export async function getBotTokenData(client, accountId) {
-  const result = await client.query(
-    "SELECT * FROM tokens WHERE account_id = $1 AND token_type = 'bot'",
-    [accountId]
-  )
+import { FieldValue } from '@google-cloud/firestore'
 
-  if (result.rows.length === 0) {
+export async function getBotTokenData(collection, accountId) {
+  const doc = await collection.doc(`token/bot/${accountId}`).get()
+
+  if (!doc.exists) {
     return undefined
   } else {
-    return result.rows[0]
+    return doc.data()
   }
 }
 
 export async function upsertBotTokenData(
-  client,
+  collection,
   accountId,
   accessToken,
   expiresOn
 ) {
-  return client.query(
-    "INSERT INTO tokens(token_type, account_id, access_token, expires_on) VALUES('bot', $1, $2, $3) ON CONFLICT (token_type, account_id) DO UPDATE set access_token = $2, expires_on = $3",
-    [accountId, accessToken, expiresOn]
+  const docRef = await collection.doc(`token/bot/${accountId}`)
+
+  return docRef.set(
+    {
+      accessToken,
+      expiresOn,
+    },
+    { merge: true }
   )
 }
 
-export async function getApiTokenData(client, accountId) {
-  const result = await client.query(
-    "SELECT * FROM tokens WHERE account_id = $1 AND token_type = 'api'",
-    [accountId]
-  )
+export async function getApiTokenData(collection, accountId) {
+  const doc = await collection.doc(`token/api/${accountId}`).get()
 
-  if (result.rows.length === 0) {
+  if (!doc.exists) {
     return undefined
   } else {
-    return result.rows[0]
+    return doc.data()
   }
 }
 
 export async function upsertApiTokenData(
-  client,
+  collection,
   accountId,
   accessToken,
   refreshToken,
   expiresOn
 ) {
-  return client.query(
-    "INSERT INTO tokens(token_type, account_id, access_token, refresh_token, expires_on) VALUES('api', $1, $2, $3, $4) ON CONFLICT (token_type, account_id) DO UPDATE set access_token = $2, refresh_token = $3, expires_on = $4",
-    [accountId, accessToken, refreshToken, expiresOn]
+  const docRef = await collection.doc(`token/api/${accountId}`)
+
+  return docRef.set(
+    {
+      accessToken,
+      refreshToken,
+      expiresOn,
+    },
+    { merge: true }
   )
 }
 
 export async function addParticipant(
-  client,
+  collection,
   meetingId,
   hostId,
   userId,
   participantName
 ) {
-  return client.query(
-    'INSERT INTO meetings(id, host_id, users, participants, date_added) VALUES($1, $2, $3, $4, $5) ON CONFLICT (id) DO UPDATE SET participants = meetings.participants || excluded.participants, users = meetings.users || excluded.users',
-    [
-      meetingId,
+  const docRef = collection.doc(`meeting/meetings/${meetingId}`)
+  const doc = await docRef.get()
+
+  if (doc.exists) {
+    const updateData = {
+      participants: FieldValue.arrayUnion(participantName),
+    }
+
+    if (userId) {
+      updateData.users = FieldValue.arrayUnion(userId)
+    }
+
+    return docRef.update(updateData)
+  } else {
+    return docRef.set({
       hostId,
-      JSON.stringify(userId ? [userId] : []),
-      JSON.stringify([participantName]),
-      new Date(),
-    ]
-  )
+      users: userId ? [userId] : [],
+      participants: [participantName],
+      dateAdded: new Date(),
+    })
+  }
 }
 
 export async function removeParticipant(
-  client,
+  collection,
   meetingId,
   userId,
   participantName
 ) {
-  if (userId) {
-    return client.query(
-      'UPDATE ONLY meetings SET participants = participants - $3, users = users - $2 WHERE id = $1',
-      [meetingId, userId, participantName]
-    )
-  } else {
-    return client.query(
-      'UPDATE ONLY meetings SET participants = participants - $2 WHERE id = $1',
-      [meetingId, participantName]
-    )
+  const docRef = collection.doc(`meeting/meetings/${meetingId}`)
+  const doc = await docRef.get()
+
+  if (!doc.exists) {
+    return
   }
+
+  const updateData = {
+    participants: FieldValue.arrayRemove(participantName),
+  }
+
+  if (userId) {
+    updateData.users = FieldValue.arrayRemove(userId)
+  }
+
+  return docRef.update(updateData)
 }
 
-export async function removeMeeting(client, meetingId) {
-  return client.query('DELETE FROM meetings WHERE id = $1', [meetingId])
+export async function removeMeeting(collection, meetingId) {
+  return collection.doc(`meeting/meetings/${meetingId}`).delete()
 }
 
-export async function getUserActiveMeeting(client, userId) {
-  const result = await client.query(
-    'SELECT id, participants FROM meetings WHERE users @> $1 ORDER BY date_added desc',
-    [JSON.stringify([userId])]
-  )
+export async function getUserActiveMeeting(collection, userId) {
+  if (!userId) {
+    return undefined
+  }
 
-  if (result.rows.length === 0) {
+  const snapshot = await collection
+    .doc('meeting')
+    .collection('meetings')
+    .where('users', 'array-contains', userId)
+    .orderBy('dateAdded')
+    .limit(1)
+    .get()
+
+  if (snapshot.empty) {
     return undefined
   } else {
-    return result.rows[0]
+    const doc = snapshot.docs[0]
+    return { id: doc.id, ...doc.data() }
   }
 }
