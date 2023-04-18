@@ -25,7 +25,7 @@ async function plugin(fastify, options = {}) {
         await fetchTokenByRefresh(
           options.clientId,
           options.clientSecret,
-          tokenData.refresh_token
+          tokenData.refreshToken
         )
 
       await upsertApiTokenData(
