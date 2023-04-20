@@ -48,6 +48,32 @@ describe('/bot route logic', () => {
     await resetDatabase(server)
   })
 
+  it('ignores an unknown command', async () => {
+    expect(sendBotMessage).not.toHaveBeenCalled()
+
+    const timestamp = 123456789
+    const payload = {
+      payload: {
+        userId: 'non-existing-id',
+        cmd: 'an-unknown-command',
+      },
+    }
+    const response = await server.inject({
+      url: '/bot',
+      method: 'POST',
+      headers: {
+        clientid: process.env.CLIENT_ID,
+        'x-zm-request-timestamp': timestamp,
+        'x-zm-signature': createVerificationSignature(timestamp, payload),
+      },
+      payload,
+    })
+
+    expect(response.statusCode).toBe(200)
+
+    expect(sendBotMessage).toHaveBeenCalledTimes(0)
+  })
+
   it('sends a bot message when user has no active meetings', async () => {
     expect(sendBotMessage).not.toHaveBeenCalled()
 
@@ -55,6 +81,7 @@ describe('/bot route logic', () => {
     const payload = {
       payload: {
         userId: 'non-existing-id',
+        cmd: '',
       },
     }
     const response = await server.inject({
@@ -89,6 +116,7 @@ describe('/bot route logic', () => {
       payload: {
         accountId: 'test_account_id',
         userId: 'test_user_id',
+        cmd: '',
       },
     }
     const response = await server.inject({

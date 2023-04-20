@@ -15,7 +15,7 @@ export default async function (fastify) {
           payload: { toJid, userJid, accountId, userId, cmd, userName },
         } = req.body
 
-        if(!ACCEPTED_COMMANDS.includes(cmd)) {
+        if (!ACCEPTED_COMMANDS.includes(cmd)) {
           res.code(200).send()
           return
         }
@@ -71,7 +71,7 @@ export default async function (fastify) {
           }
         } else {
           updatedParticipants = participants
-        } 
+        }
 
         const randomParticipants = sortRandomly(updatedParticipants)
 
