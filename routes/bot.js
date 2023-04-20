@@ -3,6 +3,8 @@ import { decrypt } from '../helpers/crypto.js'
 import { SUBCOMMANDS } from '../const.js'
 import sortRandomly from '../helpers/sortRandomly.js'
 
+const ACCEPTED_COMMANDS = ['', 'skipme']
+
 export default async function (fastify) {
   fastify.post(
     '/bot',
@@ -12,6 +14,11 @@ export default async function (fastify) {
         const {
           payload: { toJid, userJid, accountId, userId, cmd, userName },
         } = req.body
+
+        if (!ACCEPTED_COMMANDS.includes(cmd)) {
+          res.code(200).send()
+          return
+        }
 
         const sendMessage = (content, isMarkdown) => {
           return fastify.zoom.sendBotMessage({
