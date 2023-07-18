@@ -24,7 +24,7 @@ describe('/bot route verification', () => {
   })
 
   it('responds with 200 when verified', async () => {
-    const timestamp = 123456789
+    const timestamp = Date.now()
     const payload = {
       payload: {},
     }
@@ -51,7 +51,7 @@ describe('/bot route logic', () => {
   it('ignores an unknown command', async () => {
     expect(sendBotMessage).not.toHaveBeenCalled()
 
-    const timestamp = 123456789
+    const timestamp = Date.now()
     const payload = {
       payload: {
         userId: 'non-existing-id',
@@ -77,7 +77,7 @@ describe('/bot route logic', () => {
   it('sends a bot message when user has no active meetings', async () => {
     expect(sendBotMessage).not.toHaveBeenCalled()
 
-    const timestamp = 123456789
+    const timestamp = Date.now()
     const payload = {
       payload: {
         userId: 'non-existing-id',
@@ -111,7 +111,7 @@ describe('/bot route logic', () => {
 
     apiFetch.mockResolvedValueOnce({ topic: 'Test meeting topic' })
 
-    const timestamp = 123456789
+    const timestamp = Date.now()
     const payload = {
       payload: {
         accountId: 'test_account_id',
