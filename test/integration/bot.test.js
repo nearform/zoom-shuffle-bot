@@ -33,7 +33,7 @@ describe('/bot route verification', () => {
       method: 'POST',
       headers: {
         clientid: process.env.CLIENT_ID,
-        'x-zm-request-timestamp': timestamp,
+        'x-zm-request-timestamp': timestamp / 1000,
         'x-zm-signature': createVerificationSignature(timestamp, payload),
       },
       payload,
@@ -63,7 +63,7 @@ describe('/bot route logic', () => {
       method: 'POST',
       headers: {
         clientid: process.env.CLIENT_ID,
-        'x-zm-request-timestamp': timestamp,
+        'x-zm-request-timestamp': timestamp / 1000,
         'x-zm-signature': createVerificationSignature(timestamp, payload),
       },
       payload,
@@ -89,7 +89,7 @@ describe('/bot route logic', () => {
       method: 'POST',
       headers: {
         clientid: process.env.CLIENT_ID,
-        'x-zm-request-timestamp': timestamp,
+        'x-zm-request-timestamp': timestamp / 1000,
         'x-zm-signature': createVerificationSignature(timestamp, payload),
       },
       payload,
@@ -124,7 +124,7 @@ describe('/bot route logic', () => {
       method: 'POST',
       headers: {
         clientid: process.env.CLIENT_ID,
-        'x-zm-request-timestamp': timestamp,
+        'x-zm-request-timestamp': timestamp / 1000,
         'x-zm-signature': createVerificationSignature(timestamp, payload),
       },
       payload,

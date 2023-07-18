@@ -13,7 +13,7 @@ describe('verifyRequest()', () => {
     await expect(async () => {
       await verifyRequest({
         headers: {
-          'x-zm-request-timestamp': Date.now(),
+          'x-zm-request-timestamp': Math.floor(Date.now() / 1000),
           'x-zm-signature': '',
         },
         body: { foo: 'bar' },
@@ -28,7 +28,19 @@ describe('verifyRequest()', () => {
     await expect(async () => {
       await verifyRequest({
         headers: {
-          'x-zm-request-timestamp': stamp.valueOf(),
+          'x-zm-request-timestamp': Math.floor(stamp.valueOf() / 1000),
+          'x-zm-signature': '', // signature not relevant here, timestamp check comes first
+        },
+        body: { foo: 'bar' },
+      })
+    }).rejects.toThrow()
+  })
+
+  it('throws Invalid when timestamp is non-numeric', async () => {
+    await expect(async () => {
+      await verifyRequest({
+        headers: {
+          'x-zm-request-timestamp': 'hang on a minute...',
           'x-zm-signature': '', // signature not relevant here, timestamp check comes first
         },
         body: { foo: 'bar' },
@@ -39,11 +51,12 @@ describe('verifyRequest()', () => {
   it("doesn't throw when signature is valid", async () => {
     const body = { foo: 'bar' }
     const now = Date.now()
+
     const signature = createVerificationSignature(now, body)
     await expect(async () => {
       await verifyRequest({
         headers: {
-          'x-zm-request-timestamp': now,
+          'x-zm-request-timestamp': now / 1000,
           'x-zm-signature': signature,
         },
         body,
