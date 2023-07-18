@@ -18,7 +18,7 @@ export default async function verifyRequest(req) {
     throw createError(401)
   }
 
-  const signature = createVerificationSignature(timestamp, req.body)
+  const signature = createVerificationSignature(epochStamp, req.body)
 
   if (signature !== req.headers['x-zm-signature']) {
     throw createError(401)

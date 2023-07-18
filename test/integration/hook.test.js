@@ -9,7 +9,13 @@ import { createVerificationSignature } from '../../helpers/crypto.js'
 
 const server = getTestServer()
 
+let timestamp = 0
+
 describe('/hook route verification', () => {
+  beforeEach(() => {
+    timestamp = Math.floor(Date.now() / 1000)
+  })
+
   it('responds with 401 when not verified', async () => {
     const response = await server.inject({ url: '/hook', method: 'POST' })
 
@@ -17,7 +23,6 @@ describe('/hook route verification', () => {
   })
 
   it('responds with 200 when verified', async () => {
-    const timestamp = Date.now()
     const payload = {
       payload: {
         object: {},
@@ -28,7 +33,7 @@ describe('/hook route verification', () => {
       method: 'POST',
       headers: {
         clientid: process.env.CLIENT_ID,
-        'x-zm-request-timestamp': timestamp / 1000,
+        'x-zm-request-timestamp': timestamp,
         'x-zm-signature': createVerificationSignature(timestamp, payload),
       },
       payload,
@@ -41,6 +46,7 @@ describe('/hook route verification', () => {
 describe('/hook route logic', () => {
   beforeEach(async () => {
     await resetDatabase(server)
+    timestamp = Math.floor(Date.now() / 1000)
   })
 
   it('adds a meeting participant when a meeting is joined (and the meeting exists)', async () => {
@@ -50,7 +56,6 @@ describe('/hook route logic', () => {
 
     expect(meeting.data().users).not.toContain('new-user-id')
 
-    const timestamp = Date.now()
     const payload = {
       event: EVENT_PARTICIPANT_JOINED,
       payload: {
@@ -69,7 +74,7 @@ describe('/hook route logic', () => {
       method: 'POST',
       headers: {
         clientid: process.env.CLIENT_ID,
-        'x-zm-request-timestamp': timestamp / 1000,
+        'x-zm-request-timestamp': timestamp,
         'x-zm-signature': createVerificationSignature(timestamp, payload),
       },
       payload,
@@ -93,7 +98,6 @@ describe('/hook route logic', () => {
 
     expect(meeting.exists).toBe(false)
 
-    const timestamp = Date.now()
     const payload = {
       event: EVENT_PARTICIPANT_JOINED,
       payload: {
@@ -112,7 +116,7 @@ describe('/hook route logic', () => {
       method: 'POST',
       headers: {
         clientid: process.env.CLIENT_ID,
-        'x-zm-request-timestamp': timestamp / 1000,
+        'x-zm-request-timestamp': timestamp,
         'x-zm-signature': createVerificationSignature(timestamp, payload),
       },
       payload,
@@ -136,7 +140,6 @@ describe('/hook route logic', () => {
 
     expect(meeting.exists).toBe(false)
 
-    const timestamp = Date.now()
     let payload = {
       event: EVENT_PARTICIPANT_JOINED,
       payload: {
@@ -154,7 +157,7 @@ describe('/hook route logic', () => {
       method: 'POST',
       headers: {
         clientid: process.env.CLIENT_ID,
-        'x-zm-request-timestamp': timestamp / 1000,
+        'x-zm-request-timestamp': timestamp,
         'x-zm-signature': createVerificationSignature(timestamp, payload),
       },
       payload,
@@ -178,7 +181,7 @@ describe('/hook route logic', () => {
       method: 'POST',
       headers: {
         clientid: process.env.CLIENT_ID,
-        'x-zm-request-timestamp': timestamp / 1000,
+        'x-zm-request-timestamp': timestamp,
         'x-zm-signature': createVerificationSignature(timestamp, payload),
       },
       payload,
@@ -205,7 +208,6 @@ describe('/hook route logic', () => {
       '680eda40e80d89c8b3d7fdfe074042e9'
     )
 
-    const timestamp = Date.now()
     const payload = {
       event: EVENT_PARTICIPANT_LEFT,
       payload: {
@@ -224,7 +226,7 @@ describe('/hook route logic', () => {
       method: 'POST',
       headers: {
         clientid: process.env.CLIENT_ID,
-        'x-zm-request-timestamp': timestamp / 1000,
+        'x-zm-request-timestamp': timestamp,
         'x-zm-signature': createVerificationSignature(timestamp, payload),
       },
       payload,
@@ -248,7 +250,6 @@ describe('/hook route logic', () => {
 
     expect(meeting.exists).toBe(true)
 
-    const timestamp = Date.now()
     const payload = {
       event: EVENT_MEETING_ENDED,
       payload: {
@@ -263,7 +264,7 @@ describe('/hook route logic', () => {
       method: 'POST',
       headers: {
         clientid: process.env.CLIENT_ID,
-        'x-zm-request-timestamp': timestamp / 1000,
+        'x-zm-request-timestamp': timestamp,
         'x-zm-signature': createVerificationSignature(timestamp, payload),
       },
       payload,

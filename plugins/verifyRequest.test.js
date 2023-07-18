@@ -50,13 +50,13 @@ describe('verifyRequest()', () => {
 
   it("doesn't throw when signature is valid", async () => {
     const body = { foo: 'bar' }
-    const now = Date.now()
+    const epoch = Math.floor(Date.now() / 1000)
 
-    const signature = createVerificationSignature(now, body)
+    const signature = createVerificationSignature(epoch, body)
     await expect(async () => {
       await verifyRequest({
         headers: {
-          'x-zm-request-timestamp': now / 1000,
+          'x-zm-request-timestamp': epoch,
           'x-zm-signature': signature,
         },
         body,
