@@ -16,7 +16,13 @@ expect.extend({
   },
 })
 
+let timestamp = 0
+
 describe('/bot route verification', () => {
+  beforeEach(() => {
+    timestamp = Math.floor(Date.now() / 1000)
+  })
+
   it('responds with 401 when not verified', async () => {
     const response = await server.inject({ url: '/bot', method: 'POST' })
 
@@ -24,7 +30,6 @@ describe('/bot route verification', () => {
   })
 
   it('responds with 200 when verified', async () => {
-    const timestamp = 123456789
     const payload = {
       payload: {},
     }
@@ -46,12 +51,12 @@ describe('/bot route verification', () => {
 describe('/bot route logic', () => {
   beforeEach(async () => {
     await resetDatabase(server)
+    timestamp = Math.floor(Date.now() / 1000)
   })
 
   it('ignores an unknown command', async () => {
     expect(sendBotMessage).not.toHaveBeenCalled()
 
-    const timestamp = 123456789
     const payload = {
       payload: {
         userId: 'non-existing-id',
@@ -77,7 +82,6 @@ describe('/bot route logic', () => {
   it('sends a bot message when user has no active meetings', async () => {
     expect(sendBotMessage).not.toHaveBeenCalled()
 
-    const timestamp = 123456789
     const payload = {
       payload: {
         userId: 'non-existing-id',
@@ -111,7 +115,6 @@ describe('/bot route logic', () => {
 
     apiFetch.mockResolvedValueOnce({ topic: 'Test meeting topic' })
 
-    const timestamp = 123456789
     const payload = {
       payload: {
         accountId: 'test_account_id',
