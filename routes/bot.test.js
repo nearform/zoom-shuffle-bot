@@ -34,7 +34,7 @@ describe('/bot route', () => {
   it('returns a random list of all participants', async () => {
     db.getUserActiveMeeting.mockImplementation(() => ({
       participants: ['John Doe', 'Jane Smith', 'Andrej Staš'].map(name =>
-        encrypt(name)
+        encrypt(name),
       ),
       id: 123,
     }))
@@ -58,7 +58,7 @@ describe('/bot route', () => {
     expect(response.statusCode).toBe(200)
     expect(db.getUserActiveMeeting).toHaveBeenCalledWith(
       mockFirestore,
-      '1239999'
+      '1239999',
     )
     expect(mockSendBotMessage).toHaveBeenNthCalledWith(1, {
       accountId: '999999999',
@@ -88,7 +88,7 @@ describe('/bot route', () => {
   it('returns a random list of participants using the "skipme" command (excludes the person who created the list)', async () => {
     db.getUserActiveMeeting.mockImplementation(() => ({
       participants: ['John Doe', 'Jane Smith', 'Andrej Staš'].map(name =>
-        encrypt(name)
+        encrypt(name),
       ),
       id: 123,
     }))
@@ -112,7 +112,7 @@ describe('/bot route', () => {
     expect(response.statusCode).toBe(200)
     expect(db.getUserActiveMeeting).toHaveBeenCalledWith(
       mockFirestore,
-      '1239999'
+      '1239999',
     )
     expect(mockSendBotMessage).toHaveBeenNthCalledWith(1, {
       accountId: '999999999',
@@ -164,7 +164,7 @@ describe('/bot route', () => {
     expect(response.statusCode).toBe(200)
     expect(db.getUserActiveMeeting).toHaveBeenCalledWith(
       mockFirestore,
-      '1239999'
+      '1239999',
     )
     expect(mockSendBotMessage).toHaveBeenCalledWith({
       accountId: '999999999',
@@ -198,7 +198,7 @@ describe('/bot route', () => {
     expect(response.statusCode).toBe(200)
     expect(db.getUserActiveMeeting).toHaveBeenCalledWith(
       mockFirestore,
-      '1239999'
+      '1239999',
     )
     expect(mockSendBotMessage).toHaveBeenCalledWith({
       accountId: '999999999',

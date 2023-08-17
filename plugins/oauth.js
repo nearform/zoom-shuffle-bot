@@ -4,7 +4,7 @@ import { ZOOM_AUTH_BASE_URL } from '../const.js'
 
 async function fetchToken(clientId, clientSecret, params) {
   const basicAuth = Buffer.from(`${clientId}:${clientSecret}`).toString(
-    'base64'
+    'base64',
   )
 
   const queryParams = new URLSearchParams(params)
@@ -28,7 +28,7 @@ export async function fetchTokenByCode(
   clientId,
   clientSecret,
   redirectUri,
-  code
+  code,
 ) {
   return fetchToken(clientId, clientSecret, {
     grant_type: 'authorization_code',
@@ -40,7 +40,7 @@ export async function fetchTokenByCode(
 export async function fetchTokenByRefresh(
   clientId,
   clientSecret,
-  refreshToken
+  refreshToken,
 ) {
   return fetchToken(clientId, clientSecret, {
     grant_type: 'refresh_token',

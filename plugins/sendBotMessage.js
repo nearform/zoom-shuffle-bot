@@ -13,14 +13,14 @@ async function getBotToken(fastify, options, accountId) {
   } else {
     const { access_token, expires_in } = await fetchTokenByCredentials(
       options.clientId,
-      options.clientSecret
+      options.clientSecret,
     )
 
     await upsertBotTokenData(
       fastify.firestore,
       accountId,
       access_token,
-      getTokenExpiresOn(expires_in)
+      getTokenExpiresOn(expires_in),
     )
 
     return access_token
@@ -30,7 +30,7 @@ async function getBotToken(fastify, options, accountId) {
 export default async function sendBotMessage(
   fastify,
   options,
-  { toJid, userJid, accountId, content, isMarkdown }
+  { toJid, userJid, accountId, content, isMarkdown },
 ) {
   const token = await getBotToken(fastify, options, accountId)
 

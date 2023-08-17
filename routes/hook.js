@@ -39,7 +39,7 @@ export default async function (fastify) {
           meeting_id,
           host_id,
           participant.participant_user_id || participant.id,
-          encrypt(participant.user_name)
+          encrypt(participant.user_name),
         )
       }
 
@@ -48,7 +48,7 @@ export default async function (fastify) {
           fastify.firestore,
           meeting_id,
           participant.participant_user_id || participant.id,
-          encrypt(participant.user_name)
+          encrypt(participant.user_name),
         )
       }
 
@@ -57,6 +57,6 @@ export default async function (fastify) {
       }
 
       res.code(200).send()
-    }
+    },
   )
 }
