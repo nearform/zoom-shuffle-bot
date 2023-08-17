@@ -9,7 +9,7 @@ describe('validateOptions()', () => {
 
   it("doesn't throw if all required keys are present", () => {
     expect(() =>
-      validateOptions(keys, { option1: '', option2: null, option3: 1 })
+      validateOptions(keys, { option1: '', option2: null, option3: 1 }),
     ).not.toThrow()
   })
 })

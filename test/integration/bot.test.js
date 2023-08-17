@@ -105,7 +105,7 @@ describe('/bot route logic', () => {
     expect(sendBotMessage).toHaveBeenLastCalledWith(
       expect.anything(),
       expect.anything(),
-      expect.botMessageContaining("Sorry, you don't seem")
+      expect.botMessageContaining("Sorry, you don't seem"),
     )
   })
 
@@ -141,13 +141,13 @@ describe('/bot route logic', () => {
       1,
       expect.anything(),
       expect.anything(),
-      expect.botMessageContaining('Test meeting topic')
+      expect.botMessageContaining('Test meeting topic'),
     )
     expect(sendBotMessage).toHaveBeenNthCalledWith(
       2,
       expect.anything(),
       expect.anything(),
-      expect.botMessageContaining('test_user')
+      expect.botMessageContaining('test_user'),
     )
   })
 })

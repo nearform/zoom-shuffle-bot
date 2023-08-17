@@ -87,7 +87,7 @@ describe('/hook route logic', () => {
     expect(response.statusCode).toBe(200)
     expect(meeting.data().users).toContain('new-user-id')
     expect(meeting.data().participants).toContain(
-      '8a264073297f003d8b022801eaaaffaa'
+      '8a264073297f003d8b022801eaaaffaa',
     )
   })
 
@@ -129,7 +129,7 @@ describe('/hook route logic', () => {
     expect(response.statusCode).toBe(200)
     expect(meeting.data().users).toContain('new-user-id')
     expect(meeting.data().participants).toContain(
-      '8a264073297f003d8b022801eaaaffaa'
+      '8a264073297f003d8b022801eaaaffaa',
     )
   })
 
@@ -194,7 +194,7 @@ describe('/hook route logic', () => {
     expect(response.statusCode).toBe(200)
     expect(meeting.data().users).toContain('new-user-id')
     expect(meeting.data().participants).toContain(
-      '8a264073297f003d8b022801eaaaffaa'
+      '8a264073297f003d8b022801eaaaffaa',
     )
   })
 
@@ -205,7 +205,7 @@ describe('/hook route logic', () => {
 
     expect(meeting.data().users).toContain('test_user_id')
     expect(meeting.data().participants).toContain(
-      '680eda40e80d89c8b3d7fdfe074042e9'
+      '680eda40e80d89c8b3d7fdfe074042e9',
     )
 
     const payload = {
@@ -239,7 +239,7 @@ describe('/hook route logic', () => {
     expect(response.statusCode).toBe(200)
     expect(meeting.data().users).not.toContain('test_user_id')
     expect(meeting.data().participants).not.toContain(
-      '680eda40e80d89c8b3d7fdfe074042e9'
+      '680eda40e80d89c8b3d7fdfe074042e9',
     )
   })
 

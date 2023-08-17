@@ -12,7 +12,7 @@ import apiFetch from './apiFetch.js'
 async function plugin(fastify, options = {}) {
   validateOptions(
     ['clientId', 'clientSecret', 'botJid', 'secretToken', 'redirectUri'],
-    options
+    options,
   )
 
   async function getApiToken(accountId) {
@@ -25,7 +25,7 @@ async function plugin(fastify, options = {}) {
         await fetchTokenByRefresh(
           options.clientId,
           options.clientSecret,
-          tokenData.refreshToken
+          tokenData.refreshToken,
         )
 
       await upsertApiTokenData(
@@ -33,7 +33,7 @@ async function plugin(fastify, options = {}) {
         accountId,
         access_token,
         refresh_token,
-        getTokenExpiresOn(expires_in)
+        getTokenExpiresOn(expires_in),
       )
 
       return access_token
@@ -45,7 +45,7 @@ async function plugin(fastify, options = {}) {
       options.clientId,
       options.clientSecret,
       options.redirectUri,
-      code
+      code,
     )
 
     const { account_id } = await apiFetch(access_token, '/users/me')
@@ -55,7 +55,7 @@ async function plugin(fastify, options = {}) {
       account_id,
       access_token,
       refresh_token,
-      getTokenExpiresOn(expires_in)
+      getTokenExpiresOn(expires_in),
     )
   }
 

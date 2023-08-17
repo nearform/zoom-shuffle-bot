@@ -14,7 +14,7 @@ export async function upsertBotTokenData(
   collection,
   accountId,
   accessToken,
-  expiresOn
+  expiresOn,
 ) {
   const docRef = await collection.doc(`token/bot/${accountId}`)
 
@@ -23,7 +23,7 @@ export async function upsertBotTokenData(
       accessToken,
       expiresOn,
     },
-    { merge: true }
+    { merge: true },
   )
 }
 
@@ -42,7 +42,7 @@ export async function upsertApiTokenData(
   accountId,
   accessToken,
   refreshToken,
-  expiresOn
+  expiresOn,
 ) {
   const docRef = await collection.doc(`token/api/${accountId}`)
 
@@ -52,7 +52,7 @@ export async function upsertApiTokenData(
       refreshToken,
       expiresOn,
     },
-    { merge: true }
+    { merge: true },
   )
 }
 
@@ -61,7 +61,7 @@ export async function addParticipant(
   meetingId,
   hostId,
   userId,
-  participantName
+  participantName,
 ) {
   const docRef = collection.doc(`meeting/meetings/${meetingId}`)
   const doc = await docRef.get()
@@ -90,7 +90,7 @@ export async function removeParticipant(
   collection,
   meetingId,
   userId,
-  participantName
+  participantName,
 ) {
   const docRef = collection.doc(`meeting/meetings/${meetingId}`)
   const doc = await docRef.get()

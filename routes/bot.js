@@ -44,17 +44,17 @@ export default async function (fastify) {
 
         const { topic } = await fastify.zoom.fetch(
           accountId,
-          `/meetings/${meeting.id}`
+          `/meetings/${meeting.id}`,
         )
 
         const participants = meeting.participants.map(participant =>
-          decrypt(participant)
+          decrypt(participant),
         )
         let updatedParticipants
 
         if (cmd === SUBCOMMANDS.SKIP_ME) {
           updatedParticipants = participants.filter(
-            participant => participant !== userName
+            participant => participant !== userName,
           )
 
           if (updatedParticipants.length === 0) {
@@ -64,7 +64,7 @@ export default async function (fastify) {
                   text: `You're currently in *${topic}*.\nSorry, there are no other participants at the moment.`,
                 },
               },
-              true
+              true,
             )
             res.code(200).send()
             return
@@ -81,7 +81,7 @@ export default async function (fastify) {
               text: `You're currently in *${topic}*.\nHere's a random list of its ${updatedParticipants.length} participants:`,
             },
           },
-          true
+          true,
         )
 
         await sendMessage({
@@ -98,6 +98,6 @@ export default async function (fastify) {
         fastify.log.error(error)
         res.code(500).send()
       }
-    }
+    },
   )
 }
