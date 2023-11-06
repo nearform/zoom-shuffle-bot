@@ -35,7 +35,7 @@
     "@babel/preset-env": "^7.23.2",
     "@jest/globals": "^29.7.0",
     "babel-jest": "^29.7.0",
-    "eslint": "^8.52.0",
+    "eslint": "^8.53.0",
     "eslint-config-prettier": "^9.0.0",
     "eslint-plugin-jest": "^27.6.0",
     "eslint-plugin-prettier": "^5.0.1",
