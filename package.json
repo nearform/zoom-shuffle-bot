@@ -27,7 +27,7 @@
     "fluent-json-schema": "^4.2.1",
     "http-errors": "^2.0.0",
     "node-fetch": "^3.3.2",
-    "pg": "^8.11.4",
+    "pg": "^8.11.5",
     "pino-pretty": "^11.0.0"
   },
   "devDependencies": {
