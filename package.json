@@ -28,7 +28,7 @@
     "http-errors": "^2.0.0",
     "node-fetch": "^3.3.2",
     "pg": "^8.11.5",
-    "pino-pretty": "^11.1.0"
+    "pino-pretty": "^11.2.0"
   },
   "devDependencies": {
     "@babel/core": "^7.24.6",
