@@ -37,7 +37,7 @@
     "babel-jest": "^29.7.0",
     "eslint": "^8.57.0",
     "eslint-config-prettier": "^9.1.0",
-    "eslint-plugin-jest": "^28.8.3",
+    "eslint-plugin-jest": "^28.9.0",
     "eslint-plugin-prettier": "^5.2.1",
     "firebase-tools": "^13.23.1",
     "firestore-jest-mock": "^0.25.0",
