@@ -41,7 +41,7 @@
     "eslint-plugin-prettier": "^5.5.3",
     "firebase-tools": "^14.11.2",
     "firestore-jest-mock": "^0.26.0",
-    "jest": "^29.7.0",
+    "jest": "^30.0.5",
     "nodemon": "^3.1.10",
     "prettier": "^3.6.2"
   }
