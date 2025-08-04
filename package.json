@@ -33,7 +33,7 @@
   "devDependencies": {
     "@babel/core": "^7.28.0",
     "@babel/preset-env": "^7.28.0",
-    "@jest/globals": "^30.0.4",
+    "@jest/globals": "^30.0.5",
     "babel-jest": "^30.0.5",
     "eslint": "^8.57.0",
     "eslint-config-prettier": "^10.1.8",
