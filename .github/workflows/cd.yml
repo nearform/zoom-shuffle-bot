@@ -25,7 +25,7 @@ jobs:
       GCP_REGION: europe-west1
       RUN_SERVICE_NAME: ${{ github.event.inputs.run_service_name || vars.GCP_RUN_SERVICE_NAME }}
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
 
       - name: 'Authenticate with GCP'
         uses: google-github-actions/auth@v2
