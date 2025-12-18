@@ -1,6 +1,6 @@
 export default {
   collectCoverage: true,
-  setupFiles: ['./.jest/env.js', './.jest/mocks.js'],
+  setupFiles: ['./.jest/env.js'],
   clearMocks: true,
   transform: {
     '^.+\\.js$': 'babel-jest',
