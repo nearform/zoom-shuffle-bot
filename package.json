@@ -22,7 +22,7 @@
     "dotenv": "^17.2.3",
     "env-schema": "^7.0.0",
     "fast-json-stringify": "^6.1.1",
-    "fastify": "^5.6.2",
+    "fastify": "^5.7.1",
     "fastify-plugin": "^5.1.0",
     "fluent-json-schema": "^6.0.0",
     "http-errors": "^2.0.1",
