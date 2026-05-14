@@ -1,19 +1,19 @@
+import { test, describe, beforeEach, mock } from 'node:test'
 import getTestServer from './getTestServer.js'
 import resetDatabase from './resetDatabase.js'
-
-import sendBotMessage from '../../plugins/sendBotMessage.js'
-import apiFetch from '../../plugins/apiFetch.js'
 import { createVerificationSignature } from '../../helpers/crypto.js'
-
-jest.mock('../../plugins/sendBotMessage.js')
-jest.mock('../../plugins/apiFetch.js')
 
 const server = getTestServer()
 
-expect.extend({
-  botMessageContaining(received, value) {
-    return { pass: JSON.stringify(received).includes(value) }
-  },
+const mockSendBotMessage = mock.fn()
+const mockApiFetch = mock.fn()
+
+// Mock the module exports
+mock.module('../../plugins/sendBotMessage.js', {
+  exports: { default: mockSendBotMessage },
+})
+mock.module('../../plugins/apiFetch.js', {
+  exports: { default: mockApiFetch },
 })
 
 let timestamp = 0
@@ -23,13 +23,13 @@ describe('/bot route verification', () => {
     timestamp = Math.floor(Date.now() / 1000)
   })
 
-  it('responds with 401 when not verified', async () => {
+  test('responds with 401 when not verified', async t => {
     const response = await server.inject({ url: '/bot', method: 'POST' })
 
-    expect(response.statusCode).toBe(401)
+    t.assert.strictEqual(response.statusCode, 401)
   })
 
-  it('responds with 200 when verified', async () => {
+  test('responds with 200 when verified', async t => {
     const payload = {
       payload: {},
     }
@@ -44,7 +44,7 @@ describe('/bot route verification', () => {
       payload,
     })
 
-    expect(response.statusCode).toBe(200)
+    t.assert.strictEqual(response.statusCode, 200)
   })
 })
 
@@ -52,10 +52,12 @@ describe('/bot route logic', () => {
   beforeEach(async () => {
     await resetDatabase(server)
     timestamp = Math.floor(Date.now() / 1000)
+    mockSendBotMessage.mock.resetCalls()
+    mockApiFetch.mock.resetCalls()
   })
 
-  it('ignores an unknown command', async () => {
-    expect(sendBotMessage).not.toHaveBeenCalled()
+  test('ignores an unknown command', async t => {
+    t.assert.strictEqual(mockSendBotMessage.mock.calls.length, 0)
 
     const payload = {
       payload: {
@@ -74,13 +76,13 @@ describe('/bot route logic', () => {
       payload,
     })
 
-    expect(response.statusCode).toBe(200)
+    t.assert.strictEqual(response.statusCode, 200)
 
-    expect(sendBotMessage).toHaveBeenCalledTimes(0)
+    t.assert.strictEqual(mockSendBotMessage.mock.calls.length, 0)
   })
 
-  it('sends a bot message when user has no active meetings', async () => {
-    expect(sendBotMessage).not.toHaveBeenCalled()
+  test('sends a bot message when user has no active meetings', async t => {
+    t.assert.strictEqual(mockSendBotMessage.mock.calls.length, 0)
 
     const payload = {
       payload: {
@@ -99,21 +101,22 @@ describe('/bot route logic', () => {
       payload,
     })
 
-    expect(response.statusCode).toBe(200)
+    t.assert.strictEqual(response.statusCode, 200)
 
-    expect(sendBotMessage).toHaveBeenCalledTimes(1)
-    expect(sendBotMessage).toHaveBeenLastCalledWith(
-      expect.anything(),
-      expect.anything(),
-      expect.botMessageContaining("Sorry, you don't seem"),
+    t.assert.strictEqual(mockSendBotMessage.mock.calls.length, 1)
+    t.assert.strictEqual(
+      mockSendBotMessage.mock.calls[0].arguments[2]("Sorry, you don't seem"),
+      true,
     )
   })
 
-  it('sends a bot message with meeting topic and decoded user names when user has an active meeting', async () => {
-    expect(sendBotMessage).not.toHaveBeenCalled()
-    expect(apiFetch).not.toHaveBeenCalled()
+  test('sends a bot message with meeting topic and decoded user names when user has an active meeting', async t => {
+    t.assert.strictEqual(mockSendBotMessage.mock.calls.length, 0)
+    t.assert.strictEqual(mockApiFetch.mock.calls.length, 0)
 
-    apiFetch.mockResolvedValueOnce({ topic: 'Test meeting topic' })
+    mockApiFetch.mock.mockImplementationOnce(() => ({
+      topic: 'Test meeting topic',
+    }))
 
     const payload = {
       payload: {
@@ -133,21 +136,17 @@ describe('/bot route logic', () => {
       payload,
     })
 
-    expect(response.statusCode).toBe(200)
+    t.assert.strictEqual(response.statusCode, 200)
 
-    expect(apiFetch).toHaveBeenCalledTimes(1)
-    expect(sendBotMessage).toHaveBeenCalledTimes(2)
-    expect(sendBotMessage).toHaveBeenNthCalledWith(
-      1,
-      expect.anything(),
-      expect.anything(),
-      expect.botMessageContaining('Test meeting topic'),
+    t.assert.strictEqual(mockApiFetch.mock.calls.length, 1)
+    t.assert.strictEqual(mockSendBotMessage.mock.calls.length, 2)
+    t.assert.strictEqual(
+      mockSendBotMessage.mock.calls[0].arguments[2]('Test meeting topic'),
+      true,
     )
-    expect(sendBotMessage).toHaveBeenNthCalledWith(
-      2,
-      expect.anything(),
-      expect.anything(),
-      expect.botMessageContaining('test_user'),
+    t.assert.strictEqual(
+      mockSendBotMessage.mock.calls[1].arguments[2]('test_user'),
+      true,
     )
   })
 })

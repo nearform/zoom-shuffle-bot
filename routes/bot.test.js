@@ -1,19 +1,18 @@
+import { test, describe, beforeEach, afterEach, mock } from 'node:test'
 import fastify from 'fastify'
 import * as db from '../services/db.js'
 import bot from './bot.js'
 import { encrypt } from '../helpers/crypto.js'
 
-jest.mock('../helpers/sortRandomly.js', () => items => items.sort())
-
 describe('/bot route', () => {
   let server
-  const mockSendBotMessage = jest.fn()
-  const mockFetch = jest.fn()
-  const mockFirestore = jest.fn()
+  const mockSendBotMessage = mock.fn()
+  const mockFetch = mock.fn()
+  const mockFirestore = mock.fn()
   // eslint-disable-next-line no-import-assign
-  db.getUserActiveMeeting = jest.fn()
+  db.getUserActiveMeeting = mock.fn()
 
-  beforeAll(async () => {
+  beforeEach(async () => {
     server = fastify()
     server.decorate('zoom', {
       verifyRequest: async () => {},
@@ -23,22 +22,22 @@ describe('/bot route', () => {
     server.decorate('firestore', mockFirestore)
     server.register(bot)
     await server.ready()
+    mockSendBotMessage.mock.resetCalls()
+    mockFetch.mock.resetCalls()
   })
 
-  beforeEach(() => {
-    jest.resetAllMocks()
+  afterEach(async () => {
+    await server.close()
   })
 
-  afterAll(async () => server.close())
-
-  it('returns a random list of all participants', async () => {
-    db.getUserActiveMeeting.mockImplementation(() => ({
+  test('returns a random list of all participants', async t => {
+    db.getUserActiveMeeting.mock.mockImplementation(() => ({
       participants: ['John Doe', 'Jane Smith', 'Andrej Staš'].map(name =>
         encrypt(name),
       ),
       id: 123,
     }))
-    mockFetch.mockImplementation(async () => ({
+    mockFetch.mock.mockImplementation(async () => ({
       topic: 'Super zoom call',
     }))
     const response = await server.inject({
@@ -55,12 +54,12 @@ describe('/bot route', () => {
       },
     })
 
-    expect(response.statusCode).toBe(200)
-    expect(db.getUserActiveMeeting).toHaveBeenCalledWith(
+    t.assert.strictEqual(response.statusCode, 200)
+    t.assert.deepStrictEqual(db.getUserActiveMeeting.mock.calls[0].arguments, [
       mockFirestore,
       '1239999',
-    )
-    expect(mockSendBotMessage).toHaveBeenNthCalledWith(1, {
+    ])
+    t.assert.deepStrictEqual(mockSendBotMessage.mock.calls[0].arguments[0], {
       accountId: '999999999',
       content: {
         head: {
@@ -70,7 +69,7 @@ describe('/bot route', () => {
       toJid: '123abcd',
       isMarkdown: true,
     })
-    expect(mockSendBotMessage).toHaveBeenNthCalledWith(2, {
+    t.assert.deepStrictEqual(mockSendBotMessage.mock.calls[1].arguments[0], {
       accountId: '999999999',
       content: {
         body: [
@@ -85,14 +84,14 @@ describe('/bot route', () => {
     })
   })
 
-  it('returns a random list of participants using the "skipme" command (excludes the person who created the list)', async () => {
-    db.getUserActiveMeeting.mockImplementation(() => ({
+  test('returns a random list of participants using the "skipme" command (excludes the person who created the list)', async t => {
+    db.getUserActiveMeeting.mock.mockImplementation(() => ({
       participants: ['John Doe', 'Jane Smith', 'Andrej Staš'].map(name =>
         encrypt(name),
       ),
       id: 123,
     }))
-    mockFetch.mockImplementation(async () => ({
+    mockFetch.mock.mockImplementation(async () => ({
       topic: 'Super zoom call',
     }))
     const response = await server.inject({
@@ -109,12 +108,12 @@ describe('/bot route', () => {
       },
     })
 
-    expect(response.statusCode).toBe(200)
-    expect(db.getUserActiveMeeting).toHaveBeenCalledWith(
+    t.assert.strictEqual(response.statusCode, 200)
+    t.assert.deepStrictEqual(db.getUserActiveMeeting.mock.calls[0].arguments, [
       mockFirestore,
       '1239999',
-    )
-    expect(mockSendBotMessage).toHaveBeenNthCalledWith(1, {
+    ])
+    t.assert.deepStrictEqual(mockSendBotMessage.mock.calls[0].arguments[0], {
       accountId: '999999999',
       content: {
         head: {
@@ -124,7 +123,7 @@ describe('/bot route', () => {
       toJid: '123abcd',
       isMarkdown: true,
     })
-    expect(mockSendBotMessage).toHaveBeenNthCalledWith(2, {
+    t.assert.deepStrictEqual(mockSendBotMessage.mock.calls[1].arguments[0], {
       accountId: '999999999',
       content: {
         body: [
@@ -139,12 +138,12 @@ describe('/bot route', () => {
     })
   })
 
-  it('returns info that the list is empty because there is only 1 participant and he was excluded by using "skipme" command', async () => {
-    db.getUserActiveMeeting.mockImplementation(() => ({
+  test('returns info that the list is empty because there is only 1 participant and he was excluded by using "skipme" command', async t => {
+    db.getUserActiveMeeting.mock.mockImplementation(() => ({
       participants: ['Andrej Staš'].map(name => encrypt(name)),
       id: 123,
     }))
-    mockFetch.mockImplementation(async () => ({
+    mockFetch.mock.mockImplementation(async () => ({
       topic: 'Super zoom call',
     }))
     const response = await server.inject({
@@ -161,12 +160,12 @@ describe('/bot route', () => {
       },
     })
 
-    expect(response.statusCode).toBe(200)
-    expect(db.getUserActiveMeeting).toHaveBeenCalledWith(
+    t.assert.strictEqual(response.statusCode, 200)
+    t.assert.deepStrictEqual(db.getUserActiveMeeting.mock.calls[0].arguments, [
       mockFirestore,
       '1239999',
-    )
-    expect(mockSendBotMessage).toHaveBeenCalledWith({
+    ])
+    t.assert.deepStrictEqual(mockSendBotMessage.mock.calls[0].arguments[0], {
       accountId: '999999999',
       content: {
         head: {
@@ -178,8 +177,8 @@ describe('/bot route', () => {
     })
   })
 
-  it('returns info there is no ongoing meeting', async () => {
-    db.getUserActiveMeeting.mockImplementation(() => undefined)
+  test('returns info there is no ongoing meeting', async t => {
+    db.getUserActiveMeeting.mock.mockImplementation(() => undefined)
 
     const response = await server.inject({
       method: 'POST',
@@ -195,12 +194,12 @@ describe('/bot route', () => {
       },
     })
 
-    expect(response.statusCode).toBe(200)
-    expect(db.getUserActiveMeeting).toHaveBeenCalledWith(
+    t.assert.strictEqual(response.statusCode, 200)
+    t.assert.deepStrictEqual(db.getUserActiveMeeting.mock.calls[0].arguments, [
       mockFirestore,
       '1239999',
-    )
-    expect(mockSendBotMessage).toHaveBeenCalledWith({
+    ])
+    t.assert.deepStrictEqual(mockSendBotMessage.mock.calls[0].arguments[0], {
       accountId: '999999999',
       content: {
         head: {
@@ -212,8 +211,8 @@ describe('/bot route', () => {
     })
   })
 
-  it('returns status 500 when error occurred during handling the request', async () => {
-    db.getUserActiveMeeting.mockImplementation(() => new Error())
+  test('returns status 500 when error occurred during handling the request', async t => {
+    db.getUserActiveMeeting.mock.mockImplementation(() => new Error())
     const response = await server.inject({
       method: 'POST',
       url: '/bot',
@@ -228,6 +227,6 @@ describe('/bot route', () => {
       },
     })
 
-    expect(response.statusCode).toBe(500)
+    t.assert.strictEqual(response.statusCode, 500)
   })
 })
