@@ -6,12 +6,12 @@
   "type": "module",
   "scripts": {
     "test": "node --experimental-test-module-mocks --test --env-file=.env.test --test-skip-pattern=test/integration",
-    "test:unit": "node --test --env-file=.env.test --test-skip-pattern=test/integration",
+    "test:unit": "node --experimental-test-module-mocks --test --env-file=.env.test helpers/crypto.test.js plugins/helpers/getTokenExpiresOn.test.js plugins/helpers/isTokenExpired.test.js plugins/validateOptions.test.js plugins/verifyRequest.test.js routes/bot.test.js test/integration/healthcheck.test.js",
     "test:integration": "firebase emulators:exec --only firestore --project shuffle-zoom-bot \"node --test --env-file=.env.test --test-name-pattern=test/integration\"",
     "start": "node chatbot.js",
     "dev": "nodemon chatbot.js",
     "lint": "eslint . --ext .js,.cjs",
-    "lint:fix": "eslint --fix . .js,.cjs",
+    "lint:fix": "eslint --fix . --ext .js,.cjs",
     "db:up": "firebase emulators:start --project shuffle-zoom-bot"
   },
   "author": "",

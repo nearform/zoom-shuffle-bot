@@ -5,14 +5,24 @@ import { encrypt } from '../helpers/crypto.js'
 
 const mockSendBotMessage = mock.fn()
 const mockFetch = mock.fn()
-const mockGetUserActiveMeeting = mock.fn()
 
-// Mock modules once at the top level
-mock.module('../services/db.js', {
-  exports: { getUserActiveMeeting: mockGetUserActiveMeeting },
-})
-mock.module('../helpers/sortRandomly.js', {
-  exports: { default: items => items.sort() },
+const createFirestoreMock = meetingData => ({
+  doc: mock.fn(() => ({
+    collection: mock.fn(() => ({
+      where: mock.fn(() => ({
+        orderBy: mock.fn(() => ({
+          limit: mock.fn(() => ({
+            get: mock.fn(async () => ({
+              empty: meetingData === undefined,
+              docs: meetingData
+                ? [{ id: meetingData.id, data: () => meetingData }]
+                : [],
+            })),
+          })),
+        })),
+      })),
+    })),
+  })),
 })
 
 describe('/bot route', () => {
@@ -30,7 +40,6 @@ describe('/bot route', () => {
     await server.ready()
     mockSendBotMessage.mock.resetCalls()
     mockFetch.mock.resetCalls()
-    mockGetUserActiveMeeting.mock.resetCalls()
   })
 
   afterEach(async () => {
@@ -38,12 +47,13 @@ describe('/bot route', () => {
   })
 
   test('returns a random list of all participants', async t => {
-    mockGetUserActiveMeeting.mock.mockImplementation(() => ({
+    const meetingData = {
+      id: 123,
       participants: ['John Doe', 'Jane Smith', 'Andrej Staš'].map(name =>
         encrypt(name),
       ),
-      id: 123,
-    }))
+    }
+    server.firestore = createFirestoreMock(meetingData)
     mockFetch.mock.mockImplementation(async () => ({
       topic: 'Super zoom call',
     }))
@@ -62,11 +72,13 @@ describe('/bot route', () => {
     })
 
     t.assert.strictEqual(response.statusCode, 200)
-    t.assert.deepStrictEqual(mockGetUserActiveMeeting.mock.calls[0].arguments, [
-      '1239999',
-    ])
+    t.assert.deepStrictEqual(
+      server.firestore.doc.mock.calls[0].arguments[0],
+      'meeting',
+    )
     t.assert.deepStrictEqual(mockSendBotMessage.mock.calls[0].arguments[0], {
       accountId: '999999999',
+      userJid: undefined,
       content: {
         head: {
           text: `You're currently in *Super zoom call*.\nHere's a random list of its 3 participants:`,
@@ -78,12 +90,13 @@ describe('/bot route', () => {
   })
 
   test('returns a random list of participants using the "skipme" command', async t => {
-    mockGetUserActiveMeeting.mock.mockImplementation(() => ({
+    const meetingData = {
+      id: 123,
       participants: ['John Doe', 'Jane Smith', 'Andrej Staš'].map(name =>
         encrypt(name),
       ),
-      id: 123,
-    }))
+    }
+    server.firestore = createFirestoreMock(meetingData)
     mockFetch.mock.mockImplementation(async () => ({
       topic: 'Super zoom call',
     }))
@@ -102,13 +115,14 @@ describe('/bot route', () => {
     })
 
     t.assert.strictEqual(response.statusCode, 200)
-    t.assert.deepStrictEqual(mockGetUserActiveMeeting.mock.calls[0].arguments, [
-      '1239999',
-    ])
   })
 
   test('returns status 500 when error occurred during handling the request', async t => {
-    mockGetUserActiveMeeting.mock.mockImplementation(() => new Error())
+    server.firestore = {
+      doc: mock.fn(() => {
+        throw new Error('Firestore error')
+      }),
+    }
     const response = await server.inject({
       method: 'POST',
       url: '/bot',
