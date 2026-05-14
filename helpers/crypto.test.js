@@ -4,8 +4,7 @@ import { encrypt, decrypt } from './crypto.js'
 describe('encrypt()', () => {
   test('returns an encrypted string', t => {
     const encrypted = encrypt('test')
-    t.assert.ok(encrypted.length > 0)
-    t.assert.notStrictEqual(encrypted, 'test')
+    t.assert.strictEqual(encrypted, '05b1c3d9e5c8fdf16427af75c0b1db6c')
   })
 
   test('is reversible with decrypt()', t => {

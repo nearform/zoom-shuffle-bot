@@ -4,7 +4,7 @@ import { createVerificationSignature } from '../helpers/crypto.js'
 import verifyRequest from './verifyRequest.js'
 
 describe('verifyRequest()', () => {
-  test('throws when using deprecated authorization token', async t => {
+  test('throws unauthorized when using deprecated authorization token', async t => {
     await t.assert.rejects(
       async () => {
         await verifyRequest({ headers: { authorization: 'token' } })
@@ -13,7 +13,7 @@ describe('verifyRequest()', () => {
     )
   })
 
-  test('throws when the signature is invalid', async t => {
+  test('throws unauthorized when the signature is invalid', async t => {
     await t.assert.rejects(
       async () => {
         await verifyRequest({
@@ -28,7 +28,7 @@ describe('verifyRequest()', () => {
     )
   })
 
-  test('throws when timestamp is >= 5 minutes after the header', async t => {
+  test('throws unauthorized when timestamp is >= 5 minutes after the header', async t => {
     const stamp = new Date()
     stamp.setMinutes(stamp.getMinutes() - 5)
 
@@ -46,7 +46,7 @@ describe('verifyRequest()', () => {
     )
   })
 
-  test('throws when timestamp is non-numeric', async t => {
+  test('throws unauthorized when timestamp is non-numeric', async t => {
     await t.assert.rejects(
       async () => {
         await verifyRequest({
@@ -61,7 +61,7 @@ describe('verifyRequest()', () => {
     )
   })
 
-  test("doesn't throw when signature is valid", async t => {
+  test('does not throw unauthorized when signature is valid', async t => {
     const body = { foo: 'bar' }
     const epoch = Math.floor(Date.now() / 1000)
 
