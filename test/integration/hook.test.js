@@ -1,3 +1,4 @@
+import { test, describe, beforeEach } from 'node:test'
 import getTestServer from './getTestServer.js'
 import {
   EVENT_MEETING_ENDED,
@@ -16,13 +17,13 @@ describe('/hook route verification', () => {
     timestamp = Math.floor(Date.now() / 1000)
   })
 
-  it('responds with 401 when not verified', async () => {
+  test('responds with 401 when not verified', async t => {
     const response = await server.inject({ url: '/hook', method: 'POST' })
 
-    expect(response.statusCode).toBe(401)
+    t.assert.strictEqual(response.statusCode, 401)
   })
 
-  it('responds with 200 when verified', async () => {
+  test('responds with 200 when verified', async t => {
     const payload = {
       payload: {
         object: {},
@@ -39,7 +40,7 @@ describe('/hook route verification', () => {
       payload,
     })
 
-    expect(response.statusCode).toBe(200)
+    t.assert.strictEqual(response.statusCode, 200)
   })
 })
 
@@ -49,12 +50,12 @@ describe('/hook route logic', () => {
     timestamp = Math.floor(Date.now() / 1000)
   })
 
-  it('adds a meeting participant when a meeting is joined (and the meeting exists)', async () => {
+  test('adds a meeting participant when a meeting is joined (and the meeting exists)', async t => {
     let meeting = await server.firestore
       .doc('meeting/meetings/test_meeting_id')
       .get()
 
-    expect(meeting.data().users).not.toContain('new-user-id')
+    t.assert.strictEqual(meeting.data().users.includes('new-user-id'), false)
 
     const payload = {
       event: EVENT_PARTICIPANT_JOINED,
@@ -84,19 +85,20 @@ describe('/hook route logic', () => {
       .doc('meeting/meetings/test_meeting_id')
       .get()
 
-    expect(response.statusCode).toBe(200)
-    expect(meeting.data().users).toContain('new-user-id')
-    expect(meeting.data().participants).toContain(
-      '8a264073297f003d8b022801eaaaffaa',
+    t.assert.strictEqual(response.statusCode, 200)
+    t.assert.strictEqual(meeting.data().users.includes('new-user-id'), true)
+    t.assert.strictEqual(
+      meeting.data().participants.includes('8a264073297f003d8b022801eaaaffaa'),
+      true,
     )
   })
 
-  it("adds a new meeting when participant joins and the meeting doesn't exist", async () => {
+  test("adds a new meeting when participant joins and the meeting doesn't exist", async t => {
     let meeting = await server.firestore
       .doc('meeting/meetings/test_meeting_id_2')
       .get()
 
-    expect(meeting.exists).toBe(false)
+    t.assert.strictEqual(meeting.exists, false)
 
     const payload = {
       event: EVENT_PARTICIPANT_JOINED,
@@ -126,19 +128,20 @@ describe('/hook route logic', () => {
       .doc('meeting/meetings/test_meeting_id_2')
       .get()
 
-    expect(response.statusCode).toBe(200)
-    expect(meeting.data().users).toContain('new-user-id')
-    expect(meeting.data().participants).toContain(
-      '8a264073297f003d8b022801eaaaffaa',
+    t.assert.strictEqual(response.statusCode, 200)
+    t.assert.strictEqual(meeting.data().users.includes('new-user-id'), true)
+    t.assert.strictEqual(
+      meeting.data().participants.includes('8a264073297f003d8b022801eaaaffaa'),
+      true,
     )
   })
 
-  it('adds a new meeting when a non-registered user joins first and a registered user follows', async () => {
+  test('adds a new meeting when a non-registered user joins first and a registered user follows', async t => {
     let meeting = await server.firestore
       .doc('meeting/meetings/test_meeting_id_2')
       .get()
 
-    expect(meeting.exists).toBe(false)
+    t.assert.strictEqual(meeting.exists, false)
 
     let payload = {
       event: EVENT_PARTICIPANT_JOINED,
@@ -191,21 +194,23 @@ describe('/hook route logic', () => {
       .doc('meeting/meetings/test_meeting_id_2')
       .get()
 
-    expect(response.statusCode).toBe(200)
-    expect(meeting.data().users).toContain('new-user-id')
-    expect(meeting.data().participants).toContain(
-      '8a264073297f003d8b022801eaaaffaa',
+    t.assert.strictEqual(response.statusCode, 200)
+    t.assert.strictEqual(meeting.data().users.includes('new-user-id'), true)
+    t.assert.strictEqual(
+      meeting.data().participants.includes('8a264073297f003d8b022801eaaaffaa'),
+      true,
     )
   })
 
-  it('removes a meeting participant when they leave', async () => {
+  test('removes a meeting participant when they leave', async t => {
     let meeting = await server.firestore
       .doc('meeting/meetings/test_meeting_id')
       .get()
 
-    expect(meeting.data().users).toContain('test_user_id')
-    expect(meeting.data().participants).toContain(
-      '680eda40e80d89c8b3d7fdfe074042e9',
+    t.assert.strictEqual(meeting.data().users.includes('test_user_id'), true)
+    t.assert.strictEqual(
+      meeting.data().participants.includes('680eda40e80d89c8b3d7fdfe074042e9'),
+      true,
     )
 
     const payload = {
@@ -236,19 +241,20 @@ describe('/hook route logic', () => {
       .doc('meeting/meetings/test_meeting_id')
       .get()
 
-    expect(response.statusCode).toBe(200)
-    expect(meeting.data().users).not.toContain('test_user_id')
-    expect(meeting.data().participants).not.toContain(
-      '680eda40e80d89c8b3d7fdfe074042e9',
+    t.assert.strictEqual(response.statusCode, 200)
+    t.assert.strictEqual(meeting.data().users.includes('test_user_id'), false)
+    t.assert.strictEqual(
+      meeting.data().participants.includes('680eda40e80d89c8b3d7fdfe074042e9'),
+      false,
     )
   })
 
-  it('removes a meeting it ends', async () => {
+  test('removes a meeting it ends', async t => {
     let meeting = await server.firestore
       .doc('meeting/meetings/test_meeting_id')
       .get()
 
-    expect(meeting.exists).toBe(true)
+    t.assert.strictEqual(meeting.exists, true)
 
     const payload = {
       event: EVENT_MEETING_ENDED,
@@ -274,7 +280,7 @@ describe('/hook route logic', () => {
       .doc('meeting/meetings/test_meeting_id')
       .get()
 
-    expect(response.statusCode).toBe(200)
-    expect(meeting.exists).toBe(false)
+    t.assert.strictEqual(response.statusCode, 200)
+    t.assert.strictEqual(meeting.exists, false)
   })
 })

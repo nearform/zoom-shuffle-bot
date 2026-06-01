@@ -1,15 +1,16 @@
+import { test, describe } from 'node:test'
 import validateOptions from './validateOptions.js'
 
 const keys = ['option1', 'option2', 'option3']
 
 describe('validateOptions()', () => {
-  it('throws if a required key is missing', () => {
-    expect(() => validateOptions(keys, {})).toThrow(/is required$/)
+  test('throws if a required key is missing', t => {
+    t.assert.throws(() => validateOptions(keys, {}), /is required$/)
   })
 
-  it("doesn't throw if all required keys are present", () => {
-    expect(() =>
+  test("doesn't throw if all required keys are present", t => {
+    t.assert.doesNotThrow(() =>
       validateOptions(keys, { option1: '', option2: null, option3: 1 }),
-    ).not.toThrow()
+    )
   })
 })

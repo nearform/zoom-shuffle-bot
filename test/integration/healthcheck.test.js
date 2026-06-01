@@ -1,11 +1,12 @@
+import { test, describe } from 'node:test'
 import getTestServer from './getTestServer.js'
 
 describe('/healthcheck route', () => {
-  it('responds with 200', async () => {
+  test('responds with 200', async t => {
     const server = getTestServer()
 
     const response = await server.inject('/healthcheck')
 
-    expect(response.statusCode).toBe(200)
+    t.assert.strictEqual(response.statusCode, 200)
   })
 })
