@@ -16,15 +16,17 @@ mock.module('../helpers/sortRandomly.js', {
 
 describe('/bot route', () => {
   let server
+  let mockFirestore
 
   beforeEach(async () => {
+    mockFirestore = mock.fn()
     server = fastify()
     server.decorate('zoom', {
       verifyRequest: async () => {},
       sendBotMessage: mockSendBotMessage,
       fetch: mockFetch,
     })
-    server.decorate('firestore', mock.fn())
+    server.decorate('firestore', mockFirestore)
     server.register(import('./bot.js'))
     await server.ready()
     mockSendBotMessage.mock.resetCalls()
@@ -61,6 +63,10 @@ describe('/bot route', () => {
     })
 
     t.assert.strictEqual(response.statusCode, 200)
+    t.assert.strictEqual(
+      mockGetUserActiveMeeting.mock.calls[0].arguments[0],
+      mockFirestore,
+    )
     t.assert.strictEqual(
       mockGetUserActiveMeeting.mock.calls[0].arguments[1],
       '1239999',
@@ -118,6 +124,10 @@ describe('/bot route', () => {
 
     t.assert.strictEqual(response.statusCode, 200)
     t.assert.strictEqual(
+      mockGetUserActiveMeeting.mock.calls[0].arguments[0],
+      mockFirestore,
+    )
+    t.assert.strictEqual(
       mockGetUserActiveMeeting.mock.calls[0].arguments[1],
       '1239999',
     )
@@ -172,6 +182,10 @@ describe('/bot route', () => {
 
     t.assert.strictEqual(response.statusCode, 200)
     t.assert.strictEqual(
+      mockGetUserActiveMeeting.mock.calls[0].arguments[0],
+      mockFirestore,
+    )
+    t.assert.strictEqual(
       mockGetUserActiveMeeting.mock.calls[0].arguments[1],
       '1239999',
     )
@@ -206,6 +220,10 @@ describe('/bot route', () => {
     })
 
     t.assert.strictEqual(response.statusCode, 200)
+    t.assert.strictEqual(
+      mockGetUserActiveMeeting.mock.calls[0].arguments[0],
+      mockFirestore,
+    )
     t.assert.strictEqual(
       mockGetUserActiveMeeting.mock.calls[0].arguments[1],
       '1239999',
