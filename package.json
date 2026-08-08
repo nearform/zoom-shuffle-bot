@@ -7,7 +7,7 @@
   "scripts": {
     "test": "npm run test:unit && npm run test:integration",
     "test:unit": "node --experimental-test-module-mocks --test --env-file=.env.test \"helpers/**/*.test.js\" \"plugins/**/*.test.js\" \"routes/**/*.test.js\"",
-    "test:integration": "firebase emulators:exec --only firestore --project shuffle-zoom-bot \"node --test --env-file=.env.test test/integration/bot.test.js test/integration/healthcheck.test.js test/integration/hook.test.js\"",
+    "test:integration": "firebase emulators:exec --only firestore --project shuffle-zoom-bot \"node --experimental-test-module-mocks --test --test-concurrency=1 --env-file=.env.test test/integration/bot.test.js test/integration/healthcheck.test.js test/integration/hook.test.js\"",
     "start": "node chatbot.js",
     "dev": "nodemon chatbot.js",
     "lint": "eslint . --ext .js,.cjs",

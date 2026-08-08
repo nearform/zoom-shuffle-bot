@@ -1,4 +1,3 @@
-import 'dotenv/config'
 import { test, describe } from 'node:test'
 import { createVerificationSignature } from '../helpers/crypto.js'
 import verifyRequest from './verifyRequest.js'

@@ -1,19 +1,25 @@
-import { test, describe, beforeEach, mock } from 'node:test'
-import getTestServer from './getTestServer.js'
-import resetDatabase from './resetDatabase.js'
+import { test, describe, beforeEach, before, mock } from 'node:test'
 import { createVerificationSignature } from '../../helpers/crypto.js'
-
-const server = getTestServer()
 
 const mockSendBotMessage = mock.fn()
 const mockApiFetch = mock.fn()
 
-// Mock the module exports
+// Mock the module exports before any consumer is loaded.
+// ESM hoists static imports above all module code, so consumers must be
+// imported dynamically after these mocks are registered.
 mock.module('../../plugins/sendBotMessage.js', {
   exports: { default: mockSendBotMessage },
 })
 mock.module('../../plugins/apiFetch.js', {
   exports: { default: mockApiFetch },
+})
+
+let getTestServer, resetDatabase, server
+
+before(async () => {
+  ;({ default: getTestServer } = await import('./getTestServer.js'))
+  ;({ default: resetDatabase } = await import('./resetDatabase.js'))
+  server = getTestServer()
 })
 
 let timestamp = 0
@@ -104,9 +110,10 @@ describe('/bot route logic', () => {
     t.assert.strictEqual(response.statusCode, 200)
 
     t.assert.strictEqual(mockSendBotMessage.mock.calls.length, 1)
-    t.assert.strictEqual(
-      mockSendBotMessage.mock.calls[0].arguments[2]("Sorry, you don't seem"),
-      true,
+    t.assert.ok(
+      JSON.stringify(mockSendBotMessage.mock.calls[0].arguments[2]).includes(
+        "Sorry, you don't seem",
+      ),
     )
   })
 
@@ -140,13 +147,15 @@ describe('/bot route logic', () => {
 
     t.assert.strictEqual(mockApiFetch.mock.calls.length, 1)
     t.assert.strictEqual(mockSendBotMessage.mock.calls.length, 2)
-    t.assert.strictEqual(
-      mockSendBotMessage.mock.calls[0].arguments[2]('Test meeting topic'),
-      true,
+    t.assert.ok(
+      JSON.stringify(mockSendBotMessage.mock.calls[0].arguments[2]).includes(
+        'Test meeting topic',
+      ),
     )
-    t.assert.strictEqual(
-      mockSendBotMessage.mock.calls[1].arguments[2]('test_user'),
-      true,
+    t.assert.ok(
+      JSON.stringify(mockSendBotMessage.mock.calls[1].arguments[2]).includes(
+        'test_user',
+      ),
     )
   })
 })
