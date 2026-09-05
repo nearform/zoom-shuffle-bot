@@ -12,7 +12,7 @@ export default [
   prettierRecommended,
   {
     // The lint script previously passed --ext .js,.cjs, which eslint 9 removed.
-    files: ['**/*.{js,cjs}'],
+    files: ['**/*.{js,cjs,mjs}'],
     languageOptions: {
       ecmaVersion: 2021,
       sourceType: 'module',
