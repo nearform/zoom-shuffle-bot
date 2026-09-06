@@ -17,7 +17,7 @@ jobs:
           node-version-file: .nvmrc
       # firebase-tools 15 requires a JDK of at least 21 to run the Firestore
       # emulator used by the integration tests.
-      - uses: actions/setup-java@v5
+      - uses: actions/setup-java@v6
         with:
           distribution: 'temurin'
           java-version: '21'
