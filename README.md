@@ -29,6 +29,7 @@ To avoid privacy issues usernames stored in the database are encrypted using SHA
 ### Requirements
 
 - Node LTS
+- Java JDK 21 or newer (the Firestore emulator installed by `firebase-tools` >= 15 will refuse to start without it). The local install is recommended to be a [Temurin](https://adoptium.net/) JDK 21 to match CI.
 
 ### Setting up the local environment
 
